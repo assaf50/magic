@@ -145,19 +145,18 @@ document.addEventListener('selectionchange', () => {
 // זיהוי עמוד שהקהל נתקע עליו 10 שניות
 let idleTimer = null;
 let currentArticleTitle = '';
+let idleSent = false;
 
-function resetIdleTimer() {
+function startIdleTimer(title) {
   clearTimeout(idleTimer);
-  if (!currentArticleTitle) return;
+  idleSent = false;
   idleTimer = setTimeout(() => {
-    // 10 שניות עברו בלי לחיצה — שלח את שם הערך
-    db.ref('magic/idle').set({ title: currentArticleTitle, ts: Date.now() });
+    if (!idleSent && currentArticleTitle) {
+      idleSent = true;
+      db.ref('magic/idle').set({ title: currentArticleTitle, ts: Date.now() });
+    }
   }, 10000);
 }
-
-document.addEventListener('click', resetIdleTimer);
-document.addEventListener('scroll', resetIdleTimer);
-document.addEventListener('touchstart', resetIdleTimer);
 
 function goHome() {
   document.getElementById('searchResults').style.display = 'none';
@@ -210,7 +209,7 @@ async function openArticle(title) {
   document.getElementById('artBody').innerHTML = '<div class="loading">⏳ טוען ערך...</div>';
   window.scrollTo(0,0);
   currentArticleTitle = title;
-  resetIdleTimer();
+  startIdleTimer(title);
 
   try {
     // שליפת תוכן הערך מויקיפדיה עברית
