@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎩 Peek</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#000;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-family:-apple-system,sans-serif;
+  direction:rtl;
+  padding:20px;
+}
+
+.waiting {
+  color:#444;
+  font-size:20px;
+  text-align:center;
+}
+
+.word-display {
+  display:none;
+  text-align:center;
+}
+
+.word-label {
+  font-size:16px;
+  color:#888;
+  margin-bottom:12px;
+}
+
+.word {
+  font-size:64px;
+  font-weight:900;
+  color:#fff;
+  letter-spacing:-2px;
+  line-height:1;
+  margin-bottom:8px;
+}
+
+.time {
+  font-size:13px;
+  color:#555;
+  margin-bottom:32px;
+}
+
+.reset-btn {
+  padding:12px 28px;
+  background:#1a1a1a;
+  color:#666;
+  border:none;
+  border-radius:20px;
+  font-size:15px;
+  cursor:pointer;
+  font-family:inherit;
+}
+</style>
+</head>
+<body>
+
+<div class="waiting" id="waiting">⏳ ממתין למילה...</div>
+
+<div class="word-display" id="wordDisplay">
+  <div class="word-label">המילה שנבחרה:</div>
+  <div class="word" id="wordText"></div>
+  <div class="time" id="timeText"></div>
+  <button class="reset-btn" onclick="resetPeek()">🔄 איפוס</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
+  authDomain:"assafma-f409e.firebaseapp.com",
+  databaseURL:"https://assafma-f409e-default-rtdb.firebaseio.com",
+  projectId:"assafma-f409e",
+  storageBucket:"assafma-f409e.firebasestorage.app",
+  messagingSenderId:"665696235616",
+  appId:"1:665696235616:web:06fff6145f50c10dcfd305"
+});
+
+firebase.database().ref('magic/peek').on('value', snap => {
+  const data = snap.val();
+  if (!data || !data.word) return;
+
+  document.getElementById('waiting').style.display = 'none';
+  document.getElementById('wordDisplay').style.display = 'block';
+  document.getElementById('wordText').textContent = data.word;
+  
+  const d = new Date(data.ts);
+  document.getElementById('timeText').textContent = 
+    d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+});
+
+function resetPeek() {
+  firebase.database().ref('magic/peek').remove();
+  document.getElementById('waiting').style.display = 'block';
+  document.getElementById('wordDisplay').style.display = 'none';
+}
+</script>
+</body>
+</html>

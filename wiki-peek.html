@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ויקיפדיה - האנציקלופדיה החופשית</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Linux Libertine','Georgia','Times',serif; font-size:14px; color:#202122; background:#fff; direction:rtl; -webkit-user-select:text; user-select:text; }
+
+.wiki-top { display:flex; justify-content:space-between; padding:4px 12px; background:#f8f9fa; border-bottom:1px solid #eaecf0; font-size:12px; }
+.wiki-top a { color:#0645ad; text-decoration:none; }
+.wiki-logo-bar { display:flex; align-items:center; padding:8px 12px; gap:12px; border-bottom:1px solid #eaecf0; }
+.wiki-logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
+.wiki-logo-text { font-family:'Linux Libertine',Georgia,serif; font-size:20px; color:#000; }
+.wiki-logo-sub { font-size:11px; color:#54595d; }
+.search-bar { display:flex; flex:1; max-width:400px; margin-right:auto; }
+.search-input { flex:1; padding:6px 10px; border:1px solid #a2a9b1; border-radius:2px 0 0 2px; font-size:13px; outline:none; }
+.search-btn { padding:6px 12px; background:#f8f9fa; border:1px solid #a2a9b1; border-right:none; border-radius:0 2px 2px 0; cursor:pointer; }
+.wiki-tabs { display:flex; border-bottom:1px solid #a2a9b1; padding:0 12px; background:#f8f9fa; font-size:13px; }
+.wiki-tab { padding:6px 14px; color:#0645ad; border:1px solid transparent; border-bottom:none; margin-bottom:-1px; cursor:pointer; }
+.wiki-tab.active { background:#fff; border-color:#a2a9b1; color:#202122; }
+
+.wiki-content { max-width:960px; margin:0 auto; padding:12px 16px; display:flex; gap:20px; }
+.wiki-main { flex:1; min-width:0; }
+.article-title { font-family:'Linux Libertine',Georgia,serif; font-size:28px; font-weight:normal; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:12px; }
+.article-text p { margin-bottom:10px; line-height:1.8; font-size:14px; }
+.article-text a { color:#0645ad; text-decoration:none; cursor:pointer; }
+.article-text a:hover { text-decoration:underline; }
+.article-text h2 { font-family:'Linux Libertine',Georgia,serif; font-size:20px; font-weight:normal; border-bottom:1px solid #a2a9b1; padding-bottom:3px; margin:16px 0 8px; }
+
+.infobox { float:left; margin:0 0 16px 16px; border:1px solid #a2a9b1; background:#f8f9fa; padding:8px; font-size:12px; width:180px; text-align:center; }
+.infobox-title { background:#cee0f2; font-weight:bold; padding:4px; margin:-8px -8px 8px; font-size:12px; }
+.infobox-img { width:100%; height:120px; background:repeating-linear-gradient(45deg,#ddd,#ddd 10px,#eee 10px,#eee 20px); margin-bottom:6px; }
+.infobox-row { display:flex; justify-content:space-between; padding:2px 0; border-top:1px solid #eaecf0; font-size:11px; }
+
+.search-results { display:none; padding:12px 16px; max-width:960px; margin:0 auto; }
+.search-results h2 { font-size:22px; font-weight:normal; font-family:'Linux Libertine',Georgia,serif; margin-bottom:12px; border-bottom:1px solid #a2a9b1; padding-bottom:6px; }
+.result-item { margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #eaecf0; }
+.result-item h3 a { color:#0645ad; font-size:17px; text-decoration:none; cursor:pointer; }
+.result-item p { font-size:13px; color:#54595d; margin-top:4px; line-height:1.5; }
+
+.wiki-sidebar { width:180px; flex-shrink:0; font-size:12px; }
+.sidebar-box { border:1px solid #a2a9b1; margin-bottom:12px; }
+.sidebar-title { background:#cee0f2; padding:4px 8px; font-weight:bold; font-size:12px; }
+.sidebar-links { padding:6px 8px; }
+.sidebar-links a { display:block; color:#0645ad; text-decoration:none; padding:2px 0; }
+
+/* הודעה על סימון */
+.selection-toast {
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,0.75); color:#fff; padding:10px 20px;
+  border-radius:20px; font-size:14px; font-family:sans-serif;
+  display:none; z-index:999; direction:rtl;
+}
+
+@media(max-width:600px) { .wiki-sidebar{display:none} .infobox{width:130px} .article-title{font-size:20px} }
+</style>
+</head>
+<body>
+
+<div class="wiki-top">
+  <div style="display:flex;gap:10px"><a href="#">צור חשבון</a> · <a href="#">כניסה לחשבון</a></div>
+  <div><a href="#">תרומות</a> · <a href="#">דף שיחה</a></div>
+</div>
+
+<div class="wiki-logo-bar">
+  <a class="wiki-logo" href="#" onclick="goHome();return false;">
+    <svg width="50" height="50" viewBox="0 0 50 50">
+      <circle cx="25" cy="25" r="23" fill="none" stroke="#a2a9b1" stroke-width="1.5"/>
+      <text x="25" y="22" text-anchor="middle" font-size="14" fill="#202122" font-family="Georgia,serif">W</text>
+      <text x="25" y="33" text-anchor="middle" font-size="7" fill="#54595d" font-family="sans-serif">IKIPEDIA</text>
+    </svg>
+    <div><div class="wiki-logo-text">ויקיפדיה</div><div class="wiki-logo-sub">האנציקלופדיה החופשית</div></div>
+  </a>
+  <div class="search-bar">
+    <input class="search-input" id="searchInput" placeholder="חיפוש בוויקיפדיה" onkeydown="if(event.key==='Enter')doSearch()"/>
+    <button class="search-btn" onclick="doSearch()">🔍</button>
+  </div>
+</div>
+
+<div class="wiki-tabs">
+  <span class="wiki-tab active">ערך</span>
+  <span class="wiki-tab">שיחה</span>
+  <span class="wiki-tab">קריאה</span>
+  <span class="wiki-tab">עריכה</span>
+  <span class="wiki-tab">היסטוריה</span>
+</div>
+
+<div class="search-results" id="searchResults">
+  <h2 id="srTitle"></h2>
+  <div id="srItems"></div>
+</div>
+
+<div class="wiki-content" id="articleArea" style="display:none">
+  <div class="wiki-main">
+    <h1 class="article-title" id="artTitle"></h1>
+    <div class="article-text" id="artBody"></div>
+  </div>
+  <div class="wiki-sidebar">
+    <div class="sidebar-box">
+      <div class="sidebar-title">כלים</div>
+      <div class="sidebar-links">
+        <a href="#">דפים המקשרים לכאן</a>
+        <a href="#">שינויים קשורים</a>
+        <a href="#">דפים מיוחדים</a>
+        <a href="#">קישור קבוע</a>
+        <a href="#">מידע על הדף</a>
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-title">הדפסה</div>
+      <div class="sidebar-links">
+        <a href="#">גרסה להדפסה</a>
+        <a href="#">הורדה כ-PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="selection-toast" id="toast">✅ המילה נשלחה!</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
+  authDomain:"assafma-f409e.firebaseapp.com",
+  databaseURL:"https://assafma-f409e-default-rtdb.firebaseio.com",
+  projectId:"assafma-f409e",
+  storageBucket:"assafma-f409e.firebasestorage.app",
+  messagingSenderId:"665696235616",
+  appId:"1:665696235616:web:06fff6145f50c10dcfd305"
+});
+const db = firebase.database();
+
+// זיהוי סימון טקסט
+document.addEventListener('selectionchange', () => {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  const word = sel.toString().trim();
+  if (word.length < 2) return;
+  
+  // שלח לFirebase
+  db.ref('magic/peek').set({ word, ts: Date.now() });
+  
+  // הצג toast
+  const toast = document.getElementById('toast');
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 1500);
+});
+
+// ===== ARTICLES =====
+const ARTICLES = {
+  'כדור הארץ': {
+    cat:'גאוגרפיה', sub:'מדעי כדור הארץ',
+    intro:'<b>כדור הארץ</b> הוא כוכב הלכת השלישי מהשמש ועולם הים הגדול ביותר במערכת השמש. הוא גוף שמיימי היחיד הידוע שמאכלס חיים. כדור הארץ נוצר לפני כ-4.5 מיליארד שנה.',
+    sections:[
+      {title:'היסטוריה גאולוגית', text:'כדור הארץ התגבש מדיסק אקרציה סולארי לפני כ-4.54 מיליארד שנים. הירח נוצר זמן קצר לאחר מכן, ככל הנראה כתוצאה מהתנגשות ענקית עם גוף בגודל מאדים. ציפויי כדור הארץ, המעטפת והגרעין החלו להיפרד בתוך 10 עד 20 מיליון שנים לאחר היווצרות כוכב הלכת.'},
+      {title:'גאוגרפיה', text:'המשטח הכולל של כדור הארץ הוא כ-510 מיליון קמ"ר. 70.8% ממנו מכוסה ברכזי מים, בעיקר אוקיינוסים, ים, מפרץ ומדפים יבשתיים אחרים. היבשות השונות מסודרות כך שהצד היבשתי של כדור הארץ מול חצי הכדור הימי.'},
+      {title:'אקלים', text:'האקלים של כדור הארץ מושפע מגורמים רבים, ביניהם המרחק מהשמש, הרכב האטמוספרה, פעילות הוולקנים וזרמי האוקיינוס. השינוי האקלימי הנוכחי מהווה אחד האתגרים הגדולים של המאה ה-21.'},
+    ],
+    links:['אטמוספרה','אוקיינוס','יבשת','גאולוגיה','אקלים','מים','ירח','שמש']
+  },
+  'מים': {
+    cat:'כימיה', sub:'חומרים',
+    intro:'<b>מים</b> הם תרכובת כימית בעלת הנוסחה H₂O, כלומר שני אטומי מימן ואטום אחד של חמצן, הקשורים ביניהם בקשר קוולנטי. מים הם חיוניים לכל צורות החיים הידועות.',
+    sections:[
+      {title:'תכונות פיזיקליות', text:'מים הם נוזל חסר צבע, ריח וטעם בטמפרטורת החדר ולחץ אטמוספרי רגיל. הם הופכים לקרח בטמפרטורה של 0°C ולאדים בטמפרטורה של 100°C. צפיפות המים המרבית היא 1 ק"ג לליטר בטמפרטורה של 4°C.'},
+      {title:'מים בטבע', text:'המים מהווים כ-71% משטח כדור הארץ. כ-96.5% מהמים על כדור הארץ נמצאים באוקיינוסים. אך רק כ-2.5% מהמים על כדור הארץ הם מים מתוקים, ורובם קפואים בקוטב.'},
+      {title:'חשיבות ביולוגית', text:'מים הם המרכיב העיקרי של גוף האדם, המהווים כ-60% ממשקל גוף האדם הבוגר. כל תגובה ביוכימית בגוף מתרחשת בנוכחות מים. אדם יכול לשרוד ללא מזון שבועות רבים, אך ללא מים רק כמה ימים.'},
+    ],
+    links:['מימן','חמצן','קרח','אוקיינוס','נהר','גשם','שתייה','לחות']
+  },
+  'ירושלים': {
+    cat:'גאוגרפיה', sub:'ערים בישראל',
+    intro:'<b>ירושלים</b> היא עיר בישראל, הנחשבת קדושה לשלוש הדתות הגדולות — יהדות, נצרות ואסלאם. ירושלים משמשת כבירת מדינת ישראל ומהווה מרכז דתי, תרבותי ופוליטי.',
+    sections:[
+      {title:'היסטוריה', text:'ירושלים היא אחת הערים הקדומות ביותר בעולם, עם ממצאים ארכיאולוגיים המעידים על יישוב בת 5,000 שנה. העיר שימשה כבירת ממלכת יהודה בתקופת המקרא ומרכז הפולחן היהודי סביב בית המקדש.'},
+      {title:'האוכלוסייה', text:'ירושלים היא העיר הגדולה בישראל, עם אוכלוסייה של למעלה מ-900,000 תושבים. העיר מאופיינת במגוון אתני ודתי רב, עם תושבים יהודים, מוסלמים ונוצרים.'},
+      {title:'אתרי מורשת', text:'ירושלים מכילה אתרי מורשת עולמית רבים, ביניהם העיר העתיקה, כותל המערבי, כנסיית הקבר, מסגד אל-אקצא וכיפת הסלע. אתרים אלה מושכים מיליוני תיירים מדי שנה.'},
+    ],
+    links:['ישראל','יהדות','אסלאם','נצרות','בית המקדש','כותל המערבי','עיר עתיקה','דת']
+  },
+  'אריה': {
+    cat:'זואולוגיה', sub:'יונקים',
+    intro:'<b>אריה</b> הוא יונק גדול ממשפחת הפלידים. האריה מוכר בכינויו "מלך החיות". הוא אחד מארבעת "החתולים הגדולים" בסוג פנתרה, עם הנמר, הנמר מנומר והיגואר.',
+    sections:[
+      {title:'תיאור', text:'האריה הוא הפליד הגדול השני בעולם אחרי הנמר. זכר האריה הבוגר שוקל בדרך כלל בין 150 ל-250 ק"ג. תכונתו הבולטת ביותר היא הרעמה, שאינה קיימת אצל הנקבות.'},
+      {title:'התנהגות', text:'אריות הם החתולים החברתיים ביותר, וחיים בקבוצות המכונות להקות. הלהקה מורכבת בדרך כלל מנקבות קשורות, גורים ומספר קטן של זכרים בוגרים. הנקבות הן הציידות העיקריות.'},
+      {title:'בתרבות', text:'האריה סמל בולט בתרבויות רבות ברחבי העולם. הוא מופיע בסמלי מדינות רבות, בספרות, באמנות ובמיתולוגיה. בתנ"ך מוזכר האריה פעמים רבות כסמל לכוח ולגבורה.'},
+    ],
+    links:['יונק','טורף','אפריקה','פליד','נמר','חיות בר','סוואנה','להקה']
+  },
+  'מחשב': {
+    cat:'טכנולוגיה', sub:'מחשוב',
+    intro:'<b>מחשב</b> הוא מכשיר אלקטרוני המעבד מידע. מחשבים מסוגלים לבצע מגוון רחב של פעולות חישוב, עיבוד ואחסון מידע. המחשב המודרני הוא אחד ההמצאות החשובות של המאה ה-20.',
+    sections:[
+      {title:'היסטוריה', text:'המחשבים הראשונים היו מכונות ענקיות שמילאו חדרים שלמים. ENIAC, שהושלם ב-1945, נחשב למחשב הדיגיטלי האלקטרוני המתוכנת הראשון. עם הזמן, המחשבים הפכו קטנים וזולים יותר.'},
+      {title:'מרכיבים עיקריים', text:'מחשב מודרני מורכב ממעבד (CPU), זיכרון (RAM), אמצעי אחסון, לוח אם וכרטיס מסך. מערכת ההפעלה מנהלת את כל הרכיבים ומאפשרת הרצת תוכנות.'},
+      {title:'השפעה על החברה', text:'המחשב שינה את דרך החיים המודרנית ביסודה. הוא אפשר פיתוח האינטרנט, המהפכה הדיגיטלית ושינויים מהותיים בכל תחומי החיים — מרפואה ועד בידור.'},
+    ],
+    links:['אינטרנט','תוכנה','חומרה','מעבד','בינה מלאכותית','סמארטפון','רשת','אלגוריתם']
+  },
+};
+
+const GENERIC_ARTICLE = {
+  cat:'כללי', sub:'ידע כללי',
+  intro:'<b>{title}</b> הוא נושא נחקר ומתועד הנמצא בשימוש רחב בתחומים שונים של הידע האנושי. מקורו נעוץ בעת העתיקה ושימש תרבויות רבות לאורך ההיסטוריה.',
+  sections:[
+    {title:'היסטוריה', text:'לאורך ההיסטוריה, {title} תפס מקום חשוב בתרבות האנושית. מחקרים ארכיאולוגיים מצאו ראיות לשימוש ב{title} כבר בתקופה הפרה-היסטורית. עם התפתחות הציוויליזציה, תפקידו הלך והתרחב.'},
+    {title:'מאפיינים', text:'{title} מתאפיין במספר תכונות ייחודיות שהפכו אותו לנושא מחקר מרכזי. חוקרים מרחבי העולם ממשיכים לחקור היבטים שונים של הנושא ולפרסם ממצאים חדשים.'},
+    {title:'חשיבות', text:'חשיבותו של {title} ניכרת בתחומים רבים. מדענים, חוקרים ואנשי מעשה מכירים בתרומתו לקידום הידע האנושי ולשיפור איכות החיים.'},
+  ],
+  links:['היסטוריה','מדע','תרבות','טבע','חברה','כלכלה','פוליטיקה','אמנות']
+};
+
+function getArticle(title) {
+  return ARTICLES[title] || {
+    ...GENERIC_ARTICLE,
+    intro: GENERIC_ARTICLE.intro.replace(/{title}/g, title),
+    sections: GENERIC_ARTICLE.sections.map(s => ({
+      ...s,
+      text: s.text.replace(/{title}/g, title)
+    }))
+  };
+}
+
+function goHome() {
+  document.getElementById('searchResults').style.display = 'none';
+  document.getElementById('articleArea').style.display = 'none';
+  document.getElementById('searchInput').value = '';
+}
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+  showResults(q);
+}
+
+function showResults(q) {
+  document.getElementById('articleArea').style.display = 'none';
+  document.getElementById('searchResults').style.display = 'block';
+  document.getElementById('srTitle').textContent = 'תוצאות חיפוש עבור "' + q + '"';
+
+  const related = Object.keys(ARTICLES).filter(k => k !== q).slice(0,3);
+  
+  document.getElementById('srItems').innerHTML = `
+    <div class="result-item">
+      <h3><a onclick="openArticle('${q}')">${q}</a></h3>
+      <p>${q} — ערך מלא עם מידע מקיף על הנושא. לחץ לקריאה.</p>
+    </div>
+    ${related.map(r => `
+    <div class="result-item">
+      <h3><a onclick="openArticle('${r}')">${r}</a></h3>
+      <p>${r} — ראו גם ערך זה הקשור לנושא.</p>
+    </div>`).join('')}
+  `;
+}
+
+function openArticle(title) {
+  document.getElementById('searchResults').style.display = 'none';
+  document.getElementById('articleArea').style.display = 'flex';
+  document.getElementById('artTitle').textContent = title;
+  document.getElementById('searchInput').value = title;
+
+  const art = getArticle(title);
+  const links = art.links || ['מדע','טבע','חיים','עולם','היסטוריה'];
+
+  let html = `
+    <div class="infobox">
+      <div class="infobox-title">${title}</div>
+      <div class="infobox-img"></div>
+      <div class="infobox-row"><span>סוג</span><span>${art.cat}</span></div>
+      <div class="infobox-row"><span>תחום</span><span>${art.sub}</span></div>
+    </div>
+    <p>${art.intro}</p>
+  `;
+
+  art.sections.forEach(s => {
+    html += `<h2>${s.title}</h2><p>${s.text}</p>`;
+  });
+
+  html += `<h2>ראו גם</h2><p>`;
+  links.forEach((l,i) => {
+    html += `<a onclick="openArticle('${l}')">${l}</a>`;
+    if (i < links.length-1) html += ' · ';
+  });
+  html += `</p>`;
+
+  html += `<div style="margin-top:20px;padding-top:8px;border-top:1px solid #a2a9b1;font-size:12px;color:#54595d;">
+    דף זה שוכלל לאחרונה ב-${new Date().toLocaleDateString('he-IL')} · 
+    <a href="#" onclick="return false;">תרמו לוויקיפדיה</a>
+  </div>`;
+
+  document.getElementById('artBody').innerHTML = html;
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
