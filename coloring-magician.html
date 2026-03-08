@@ -127,20 +127,27 @@
     canvas.width = 400; canvas.height = 640;
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    const blob = new Blob([svgData], {type:'image/svg+xml'});
+    const blob = new Blob([svgData], {type:'image/svg+xml;charset=utf-8'});
     const url = URL.createObjectURL(blob);
     img.onload = () => {
-      ctx.drawImage(img, 0, 0, 400, 640);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0,0,400,640);
+      ctx.drawImage(img, 70, 10, 260, 420);
       URL.revokeObjectURL(url);
-      canvas.toBlob(blob => {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'magic.png';
-        a.click();
-        // הסתר tapZone
+      // פתח את התמונה ישירות בדפדפן — המשתמש לוחץ לחיצה ארוכה ושומר
+      canvas.toBlob(blob2 => {
+        const imgUrl = URL.createObjectURL(blob2);
+        // החלף את המסך השחור בתמונה
         document.getElementById('tapZone').style.display = 'none';
-        document.getElementById('savedMsg').style.display = 'block';
-        setTimeout(()=>document.getElementById('savedMsg').style.display='none', 2000);
+        document.body.style.background = '#000';
+        const displayImg = document.createElement('img');
+        displayImg.src = imgUrl;
+        displayImg.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:90vw;max-height:90vh;border-radius:12px;';
+        document.body.appendChild(displayImg);
+        const hint = document.createElement('div');
+        hint.textContent = 'לחץ לחיצה ארוכה על התמונה ← שמור';
+        hint.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.6);font-family:-apple-system,sans-serif;font-size:14px;';
+        document.body.appendChild(hint);
       }, 'image/png');
     };
     img.src = url;
