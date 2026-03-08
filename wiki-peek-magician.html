@@ -67,7 +67,7 @@ body {
 <div class="waiting" id="waiting">⏳ ממתין למילה...</div>
 
 <div class="word-display" id="wordDisplay">
-  <div class="word-label">המילה שנבחרה:</div>
+  <div class="word-label" id="wordLabel">ממתין...</div>
   <div class="word" id="wordText"></div>
   <div class="time" id="timeText"></div>
   <button class="reset-btn" onclick="resetPeek()">🔄 איפוס</button>
@@ -86,21 +86,33 @@ firebase.initializeApp({
   appId:"1:665696235616:web:06fff6145f50c10dcfd305"
 });
 
+// מילה מסומנת
 firebase.database().ref('magic/peek').on('value', snap => {
   const data = snap.val();
   if (!data || !data.word) return;
-
   document.getElementById('waiting').style.display = 'none';
   document.getElementById('wordDisplay').style.display = 'block';
+  document.getElementById('wordLabel').textContent = 'מילה שנבחרה:';
   document.getElementById('wordText').textContent = data.word;
-  
   const d = new Date(data.ts);
-  document.getElementById('timeText').textContent = 
-    d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  document.getElementById('timeText').textContent = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+});
+
+// ערך שנתקע עליו 10 שניות
+firebase.database().ref('magic/idle').on('value', snap => {
+  const data = snap.val();
+  if (!data || !data.title) return;
+  document.getElementById('waiting').style.display = 'none';
+  document.getElementById('wordDisplay').style.display = 'block';
+  document.getElementById('wordLabel').textContent = 'נתקע על הערך:';
+  document.getElementById('wordText').textContent = data.title;
+  const d = new Date(data.ts);
+  document.getElementById('timeText').textContent = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
 });
 
 function resetPeek() {
   firebase.database().ref('magic/peek').remove();
+  firebase.database().ref('magic/idle').remove();
   document.getElementById('waiting').style.display = 'block';
   document.getElementById('wordDisplay').style.display = 'none';
 }

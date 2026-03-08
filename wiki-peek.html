@@ -137,13 +137,27 @@ const db = firebase.database();
 document.addEventListener('selectionchange', () => {
   const sel = window.getSelection();
   if (!sel || sel.isCollapsed) return;
-  const word = sel.toString().trim().split(/\s+/)[0]; // מילה ראשונה בלבד
+  const word = sel.toString().trim().split(/\s+/)[0];
   if (word.length < 2) return;
   db.ref('magic/peek').set({ word, ts: Date.now() });
-  const t = document.getElementById('toast');
-  t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 1500);
 });
+
+// זיהוי עמוד שהקהל נתקע עליו 10 שניות
+let idleTimer = null;
+let currentArticleTitle = '';
+
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  if (!currentArticleTitle) return;
+  idleTimer = setTimeout(() => {
+    // 10 שניות עברו בלי לחיצה — שלח את שם הערך
+    db.ref('magic/idle').set({ title: currentArticleTitle, ts: Date.now() });
+  }, 10000);
+}
+
+document.addEventListener('click', resetIdleTimer);
+document.addEventListener('scroll', resetIdleTimer);
+document.addEventListener('touchstart', resetIdleTimer);
 
 function goHome() {
   document.getElementById('searchResults').style.display = 'none';
@@ -195,6 +209,8 @@ async function openArticle(title) {
   document.getElementById('searchInput').value = title;
   document.getElementById('artBody').innerHTML = '<div class="loading">⏳ טוען ערך...</div>';
   window.scrollTo(0,0);
+  currentArticleTitle = title;
+  resetIdleTimer();
 
   try {
     // שליפת תוכן הערך מויקיפדיה עברית
