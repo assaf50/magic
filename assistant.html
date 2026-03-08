@@ -6,10 +6,9 @@
 <title>מסך העוזר 🤫</title>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
     authDomain: "assafma-f409e.firebaseapp.com",
@@ -20,11 +19,11 @@
     appId: "1:665696235616:web:06fff6145f50c10dcfd305"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
   window.sendNumber = (num) => {
-    set(ref(db, 'magic/myNumber'), { value: num, ts: Date.now() })
+    db.ref('magic/myNumber').set({ value: num, ts: Date.now() })
       .then(() => {
         document.getElementById('sentBox').style.display = 'block';
         document.getElementById('sentVal').textContent = num;
