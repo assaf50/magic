@@ -27,18 +27,23 @@
       window._magicNumber = data.value;
       window._magicReady = true;
       console.log('Magic number received:', data.value);
-      setTimeout(() => {
-        current = String(data.value);
-        stored = null; op = null; justCalc = false; _magicUsed = false;
+      // store it and display when ready
+      window._pendingMagic = data.value;
+      const tryDisplay = () => {
         const d = document.getElementById('display');
         if (d) {
-          d.textContent = current;
+          d.textContent = String(data.value);
           d.className = 'main-display';
-          if (current.length > 9) d.classList.add('small');
-          if (current.length > 7) d.classList.add('medium');
+          const len = String(data.value).length;
+          if (len > 9) d.classList.add('small');
+          else if (len > 7) d.classList.add('medium');
+          const ac = document.getElementById('acLabel');
+          if (ac) ac.textContent = 'C';
+        } else {
+          setTimeout(tryDisplay, 100);
         }
-        document.getElementById('acLabel').textContent = 'C';
-      }, 500);
+      };
+      tryDisplay();
     }
   });
 </script>
