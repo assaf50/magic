@@ -209,7 +209,6 @@ async function openArticle(title) {
   document.getElementById('artBody').innerHTML = '<div class="loading">⏳ טוען ערך...</div>';
   window.scrollTo(0,0);
   currentArticleTitle = title;
-  startIdleTimer(title);
 
   try {
     // שליפת תוכן הערך מויקיפדיה עברית
@@ -242,8 +241,12 @@ async function openArticle(title) {
       if (!img.src.startsWith('http')) img.removeAttribute('src');
     });
 
+    // התחל טיימר רק אחרי שהדף נטען
+    startIdleTimer(title);
+
   } catch(e) {
     document.getElementById('artBody').innerHTML = '<p>שגיאה בטעינה.</p>';
+    startIdleTimer(title);
   }
 }
 </script>
