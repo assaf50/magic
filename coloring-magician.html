@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎩 מסך הקוסם</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Rubik',sans-serif;
+    background:#0f0f0f;
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:20px 16px;
+  }
+
+  h1 {
+    font-size:24px;
+    font-weight:900;
+    margin-bottom:20px;
+    background:linear-gradient(135deg,#f7971e,#ffd200);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+
+  .waiting {
+    text-align:center;
+    color:#555;
+    font-size:18px;
+    margin-top:60px;
+  }
+
+  .result {
+    display:none;
+    width:100%;
+    max-width:400px;
+  }
+
+  .char-name {
+    text-align:center;
+    font-size:22px;
+    font-weight:900;
+    color:#ffd200;
+    margin-bottom:16px;
+  }
+
+  .figure-wrap {
+    width:180px;
+    height:290px;
+    margin:0 auto 20px;
+  }
+  .figure-wrap svg { width:100%; height:100%; }
+
+  .color-list {
+    background:#1a1a1a;
+    border-radius:16px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:20px;
+  }
+
+  .color-row {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:16px;
+  }
+
+  .color-row .zone { color:#aaa; }
+  .color-row .color-val {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:700;
+  }
+
+  .color-swatch {
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    border:2px solid #333;
+  }
+
+  .reset-btn {
+    width:100%;
+    padding:14px;
+    background:#333;
+    color:#fff;
+    font-family:'Rubik',sans-serif;
+    font-weight:700;
+    font-size:16px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<h1>🎩 מסך הקוסם</h1>
+
+<div class="waiting" id="waiting">
+  ⏳ ממתין לצבעים מהעוזר...
+</div>
+
+<div class="result" id="result">
+  <div class="char-name" id="charName"></div>
+
+  <div class="figure-wrap">
+    <svg id="figure" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="45" rx="32" ry="38" fill="#f5c5a3" stroke="#333" stroke-width="1.5"/>
+      <ellipse id="hair" cx="100" cy="20" rx="32" ry="18" fill="#333"/>
+      <circle cx="88" cy="40" r="4" fill="#222"/>
+      <circle cx="112" cy="40" r="4" fill="#222"/>
+      <circle cx="89" cy="39" r="1.5" fill="#fff"/>
+      <circle cx="113" cy="39" r="1.5" fill="#fff"/>
+      <ellipse cx="100" cy="52" rx="4" ry="3" fill="#e8a882"/>
+      <path d="M88 62 Q100 70 112 62" stroke="#c0704a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <rect x="88" y="80" width="24" height="18" fill="#f5c5a3"/>
+      <path id="jacket" d="M50 98 L70 95 L100 105 L130 95 L150 98 L158 200 L42 200 Z" fill="#1a1a2e" stroke="#333" stroke-width="1.5"/>
+      <path id="shirt" d="M72 97 L100 107 L128 97 L132 200 L68 200 Z" fill="#4a90d9" stroke="#333" stroke-width="1.5"/>
+      <path id="tie" d="M96 100 L104 100 L108 160 L100 170 L92 160 Z" fill="#e74c3c" stroke="#333" stroke-width="1.5"/>
+      <path id="pants" d="M60 198 L140 198 L145 290 L108 290 L100 250 L92 290 L55 290 Z" fill="#2c3e50" stroke="#333" stroke-width="1.5"/>
+      <ellipse id="shoe-left" cx="68" cy="296" rx="18" ry="10" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+      <ellipse id="shoe-right" cx="132" cy="296" rx="18" ry="10" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+      <path d="M52 100 L30 170 L44 174 L62 110 Z" fill="#1a1a2e" stroke="#333" stroke-width="1.5"/>
+      <path d="M148 100 L170 170 L156 174 L138 110 Z" fill="#1a1a2e" stroke="#333" stroke-width="1.5"/>
+      <ellipse cx="37" cy="176" rx="10" ry="8" fill="#f5c5a3"/>
+      <ellipse cx="163" cy="176" rx="10" ry="8" fill="#f5c5a3"/>
+    </svg>
+  </div>
+
+  <div class="color-list" id="colorList"></div>
+  <button class="reset-btn" onclick="resetView()">🔄 איפוס לסיבוב הבא</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  const COLOR_HEX = {
+    'אדום':'#e74c3c','כחול':'#3498db','ירוק':'#2ecc71','צהוב':'#f1c40f',
+    'כתום':'#e67e22','סגול':'#9b59b6','ורוד':'#e91e8c','לבן':'#ecf0f1',
+    'שחור':'#1a1a1a','חום':'#8B4513'
+  };
+
+  firebase.initializeApp({
+    apiKey: "AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
+    authDomain: "assafma-f409e.firebaseapp.com",
+    databaseURL: "https://assafma-f409e-default-rtdb.firebaseio.com",
+    projectId: "assafma-f409e",
+    storageBucket: "assafma-f409e.firebasestorage.app",
+    messagingSenderId: "665696235616",
+    appId: "1:665696235616:web:06fff6145f50c10dcfd305"
+  });
+
+  firebase.database().ref('magic/coloring').on('value', snap => {
+    const data = snap.val();
+    if (!data) return;
+
+    document.getElementById('waiting').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('charName').textContent = data.char;
+
+    const c = data.colors;
+    // Apply colors to figure
+    applyColor('jacket', c.jacket);
+    applyColor('shirt', c.shirt);
+    applyColor('tie', c.tie);
+    applyColor('pants', c.pants);
+    applyColor('shoe-left', c.shoes);
+    applyColor('shoe-right', c.shoes);
+
+    // Color list
+    const list = document.getElementById('colorList');
+    list.innerHTML = '';
+    const zones = {jacket:'ג׳קט', shirt:'חולצה', tie:'עניבה', pants:'מכנס', shoes:'נעלים'};
+    Object.entries(zones).forEach(([key, label]) => {
+      const colorName = key === 'shoes' ? c.shoes : c[key];
+      const hex = COLOR_HEX[colorName] || '#888';
+      list.innerHTML += `
+        <div class="color-row">
+          <span class="zone">${label}</span>
+          <span class="color-val">
+            <div class="color-swatch" style="background:${hex}"></div>
+            ${colorName}
+          </span>
+        </div>`;
+    });
+  });
+
+  function applyColor(id, colorName) {
+    const hex = COLOR_HEX[colorName] || '#888';
+    document.getElementById(id)?.setAttribute('fill', hex);
+  }
+
+  function resetView() {
+    firebase.database().ref('magic/coloring').remove();
+    document.getElementById('waiting').style.display = 'block';
+    document.getElementById('result').style.display = 'none';
+  }
+</script>
+</body>
+</html>
