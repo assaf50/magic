@@ -3,30 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎩 מסך הקוסם</title>
+<title>🎩</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
     background:#000;
-    min-height:100vh;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
     display:flex;
     align-items:center;
     justify-content:center;
   }
-  .figure-wrap {
-    width:260px;
-    height:420px;
-    opacity:0;
-    transition:opacity 0.5s;
+
+  /* מסך שחור לגמרי - לחיצה בכל מקום שומרת */
+  #tapZone {
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    z-index:10;
+    display:none;
+    cursor:pointer;
   }
-  .figure-wrap.visible { opacity:1; }
-  .figure-wrap svg { width:100%; height:100%; }
+
+  /* הדמות מוסתרת */
+  #figureWrap {
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+  }
+  #figureWrap svg { width:260px; height:420px; }
+
+  /* הודעה קטנה אחרי שמירה */
+  #savedMsg {
+    display:none;
+    position:fixed;
+    bottom:40px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(255,255,255,0.1);
+    color:#fff;
+    padding:12px 24px;
+    border-radius:20px;
+    font-family:-apple-system,sans-serif;
+    font-size:16px;
+    z-index:20;
+  }
 </style>
 </head>
 <body>
 
-<div class="figure-wrap" id="figureWrap">
-  <svg viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
+<!-- הדמות הצבועה (בלתי נראית) -->
+<div id="figureWrap">
+  <svg id="figureSvg" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
+    <rect width="200" height="320" fill="#000"/>
     <ellipse cx="100" cy="45" rx="32" ry="38" fill="#f5c5a3" stroke="#333" stroke-width="1.5"/>
     <ellipse cx="100" cy="20" rx="32" ry="18" fill="#555"/>
     <circle cx="88" cy="40" r="4" fill="#222"/>
@@ -48,6 +78,11 @@
     <ellipse cx="163" cy="176" rx="10" ry="8" fill="#f5c5a3"/>
   </svg>
 </div>
+
+<!-- מסך שחור שמופעל בלחיצה שומר -->
+<div id="tapZone" onclick="saveImage()"></div>
+
+<div id="savedMsg">✅ נשמר!</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -72,14 +107,44 @@
     const data = snap.val();
     if (!data) return;
     const c = data.colors;
+
+    // צבע את הדמות בסתר
     document.getElementById('jacket').setAttribute('fill', COLOR_HEX[c.jacket]||'#888');
     document.getElementById('shirt').setAttribute('fill', COLOR_HEX[c.shirt]||'#888');
     document.getElementById('tie').setAttribute('fill', COLOR_HEX[c.tie]||'#888');
     document.getElementById('pants').setAttribute('fill', COLOR_HEX[c.pants]||'#888');
     document.getElementById('shoe-left').setAttribute('fill', COLOR_HEX[c.shoes]||'#888');
     document.getElementById('shoe-right').setAttribute('fill', COLOR_HEX[c.shoes]||'#888');
-    document.getElementById('figureWrap').classList.add('visible');
+
+    // הפעל מסך שחור — לחיצה תשמור
+    document.getElementById('tapZone').style.display = 'block';
   });
+
+  function saveImage() {
+    const svg = document.getElementById('figureSvg');
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    canvas.width = 400; canvas.height = 640;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    const blob = new Blob([svgData], {type:'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, 400, 640);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'magic.png';
+        a.click();
+        // הסתר tapZone
+        document.getElementById('tapZone').style.display = 'none';
+        document.getElementById('savedMsg').style.display = 'block';
+        setTimeout(()=>document.getElementById('savedMsg').style.display='none', 2000);
+      }, 'image/png');
+    };
+    img.src = url;
+  }
 </script>
 </body>
 </html>
