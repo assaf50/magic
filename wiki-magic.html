@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ויקיפדיה - האנציקלופדיה החופשית</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Linux Libertine','Georgia','Times',serif; font-size:14px; color:#202122; background:#fff; direction:rtl; }
+
+/* HEADER */
+.wiki-top { display:flex; justify-content:space-between; align-items:center; padding:4px 12px; background:#f8f9fa; border-bottom:1px solid #eaecf0; font-size:12px; color:#54595d; }
+.wiki-top a { color:#0645ad; text-decoration:none; }
+.wiki-logo-bar { display:flex; align-items:center; padding:8px 12px; gap:12px; border-bottom:1px solid #eaecf0; }
+.wiki-logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
+.wiki-logo-text { font-family:'Linux Libertine',Georgia,serif; font-size:20px; color:#000; }
+.wiki-logo-sub { font-size:11px; color:#54595d; }
+.search-bar { display:flex; flex:1; max-width:400px; margin-right:auto; }
+.search-input { flex:1; padding:6px 10px; border:1px solid #a2a9b1; border-radius:2px 0 0 2px; font-size:13px; outline:none; }
+.search-btn { padding:6px 12px; background:#f8f9fa; border:1px solid #a2a9b1; border-right:none; border-radius:0 2px 2px 0; cursor:pointer; }
+.wiki-tabs { display:flex; border-bottom:1px solid #a2a9b1; padding:0 12px; background:#f8f9fa; font-size:13px; }
+.wiki-tab { padding:6px 14px; color:#0645ad; border:1px solid transparent; border-bottom:none; margin-bottom:-1px; cursor:pointer; }
+.wiki-tab.active { background:#fff; border-color:#a2a9b1; color:#202122; }
+
+/* CONTENT */
+.wiki-content { max-width:960px; margin:0 auto; padding:12px 16px; display:flex; gap:20px; }
+.wiki-main { flex:1; min-width:0; }
+.article-title { font-family:'Linux Libertine',Georgia,serif; font-size:28px; font-weight:normal; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:12px; }
+.article-text p { margin-bottom:10px; line-height:1.7; font-size:14px; }
+.article-text a { color:#0645ad; text-decoration:none; cursor:pointer; }
+.article-text a:hover { text-decoration:underline; }
+.article-text h2 { font-family:'Linux Libertine',Georgia,serif; font-size:20px; font-weight:normal; border-bottom:1px solid #a2a9b1; padding-bottom:3px; margin:16px 0 8px; }
+
+/* INFOBOX */
+.infobox { float:left; margin:0 0 16px 16px; border:1px solid #a2a9b1; background:#f8f9fa; padding:8px; font-size:12px; width:180px; text-align:center; }
+.infobox-title { background:#cee0f2; font-weight:bold; padding:4px; margin:-8px -8px 8px; font-size:12px; }
+.infobox-img { width:100%; height:120px; background:repeating-linear-gradient(45deg,#ddd,#ddd 10px,#eee 10px,#eee 20px); margin-bottom:6px; }
+.infobox-row { display:flex; justify-content:space-between; padding:2px 0; border-top:1px solid #eaecf0; font-size:11px; }
+.infobox-label { color:#54595d; }
+
+/* SEARCH RESULTS */
+.search-results { display:none; padding:12px 16px; max-width:960px; margin:0 auto; }
+.search-results h2 { font-size:22px; font-weight:normal; font-family:'Linux Libertine',Georgia,serif; margin-bottom:12px; border-bottom:1px solid #a2a9b1; padding-bottom:6px; }
+.result-item { margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #eaecf0; }
+.result-item h3 a { color:#0645ad; font-size:17px; text-decoration:none; cursor:pointer; }
+.result-item h3 a:hover { text-decoration:underline; }
+.result-item p { font-size:13px; color:#54595d; margin-top:4px; line-height:1.5; }
+
+/* SIDEBAR */
+.wiki-sidebar { width:180px; flex-shrink:0; font-size:12px; }
+.sidebar-box { border:1px solid #a2a9b1; margin-bottom:12px; }
+.sidebar-title { background:#cee0f2; padding:4px 8px; font-weight:bold; font-size:12px; }
+.sidebar-links { padding:6px 8px; }
+.sidebar-links a { display:block; color:#0645ad; text-decoration:none; padding:2px 0; }
+
+/* SETUP */
+.setup-overlay { position:fixed; top:0;left:0;width:100%;height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:1000; }
+.setup-box { background:#fff; border-radius:16px; padding:28px 24px; width:90%; max-width:340px; text-align:center; direction:rtl; }
+.setup-box h2 { font-size:20px; margin-bottom:20px; font-family:sans-serif; }
+.setup-label { font-size:13px; color:#666; margin-bottom:6px; text-align:right; font-family:sans-serif; }
+.setup-input { width:100%; padding:12px; border:2px solid #ddd; border-radius:8px; font-size:18px; text-align:center; margin-bottom:14px; font-family:inherit; direction:rtl; }
+.setup-input:focus { border-color:#0645ad; outline:none; }
+.setup-btn { width:100%; padding:14px; background:#0645ad; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; font-family:sans-serif; }
+
+/* MAGIC HIGHLIGHT */
+.magic-highlight { background:#fff3cd; border-bottom:2px solid #e6a817; padding:0 2px; }
+
+@media(max-width:600px) { .wiki-sidebar{display:none} .infobox{width:140px} .article-title{font-size:20px} }
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div class="setup-overlay" id="setupScreen">
+  <div class="setup-box">
+    <h2>🎩 הגדרת הקסם</h2>
+    <div class="setup-label">שם האדם (עברית):</div>
+    <input class="setup-input" id="nameInput" placeholder="איתמר" maxlength="10" dir="rtl"/>
+    <div class="setup-label">מיקום האות בכל מילה:</div>
+    <input class="setup-input" id="posInput" type="number" placeholder="3" min="1" max="8" value="3"/>
+    <button class="setup-btn" onclick="startMagic()">התחל קסם ▶</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="wiki-header">
+  <div class="wiki-top">
+    <div style="display:flex;gap:12px"><a href="#">צור חשבון</a> · <a href="#">כניסה לחשבון</a></div>
+    <div><a href="#">תרומות</a> · <a href="#">דף שיחה</a></div>
+  </div>
+  <div class="wiki-logo-bar">
+    <a class="wiki-logo" href="#" onclick="goHome();return false;">
+      <svg width="50" height="50" viewBox="0 0 50 50"><circle cx="25" cy="25" r="23" fill="none" stroke="#a2a9b1" stroke-width="1.5"/><text x="25" y="22" text-anchor="middle" font-size="14" fill="#202122" font-family="Georgia,serif">W</text><text x="25" y="33" text-anchor="middle" font-size="7" fill="#54595d" font-family="sans-serif">IKIPEDIA</text></svg>
+      <div><div class="wiki-logo-text">ויקיפדיה</div><div class="wiki-logo-sub">האנציקלופדיה החופשית</div></div>
+    </a>
+    <div class="search-bar">
+      <input class="search-input" id="searchInput" placeholder="חיפוש בוויקיפדיה" onkeydown="if(event.key==='Enter')doSearch()"/>
+      <button class="search-btn" onclick="doSearch()">🔍</button>
+    </div>
+  </div>
+  <div class="wiki-tabs">
+    <span class="wiki-tab active">ערך</span>
+    <span class="wiki-tab">שיחה</span>
+    <span class="wiki-tab">קריאה</span>
+    <span class="wiki-tab">עריכה</span>
+    <span class="wiki-tab">היסטוריה</span>
+  </div>
+</div>
+
+<!-- SEARCH RESULTS -->
+<div class="search-results" id="searchResults">
+  <h2 id="srTitle"></h2>
+  <div id="srItems"></div>
+</div>
+
+<!-- ARTICLE -->
+<div class="wiki-content" id="articleArea" style="display:none">
+  <div class="wiki-main">
+    <h1 class="article-title" id="artTitle"></h1>
+    <div class="article-text" id="artBody"></div>
+  </div>
+  <div class="wiki-sidebar">
+    <div class="sidebar-box">
+      <div class="sidebar-title">כלים</div>
+      <div class="sidebar-links">
+        <a href="#">דפים המקשרים לכאן</a>
+        <a href="#">שינויים קשורים</a>
+        <a href="#">דפים מיוחדים</a>
+        <a href="#">קישור קבוע</a>
+        <a href="#">מידע על הדף</a>
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-title">הדפסה</div>
+      <div class="sidebar-links">
+        <a href="#">גרסה להדפסה</a>
+        <a href="#">הורדה כ-PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let magicName = '';
+let magicPos = 3;
+let step = 0;
+
+// מילים לפי האות שצריכה להופיע במיקום N
+// מאורגן: אות -> רשימת מילים שהאות מופיעה בהן במקומות שונים
+const WORD_BANK = {
+  'א':['ארץ','אדם','אור','אמת','אחד','אריה','אבן','אגם','אדום','אילן','אמא','אנשים','אפשר','אסיה','ארמון','אפריקה','אוקיינוס','אמריקה','אנרגיה','אלכסון'],
+  'ב':['בית','בן','בת','בוקר','בשר','בלב','ביום','בלילה','בחוץ','בנין','בריאה','בשדה','בעץ','ברזל','בטון','ביצה','בריכה','ברכה','בקבוק','בנאדם'],
+  'ג':['גן','גשם','גדול','גיבור','גלים','גבוה','גמל','גשר','גוף','גיל','גבעה','גינה','גרעין','גיטרה','גלקסיה','גרמניה'],
+  'ד':['דרך','דגל','דבר','דגים','דמות','דלת','דשא','דב','דוד','דבש','דולר','דמוקרטיה','דינוזאור','דירה','דקה'],
+  'ה':['הר','הים','הגן','הכל','הלב','הבית','הספר','הנהר','הציפור','העיר','המים','הזמן','האדם','הארץ','השמש'],
+  'ו':['ורד','ולד','וילון','ורוד','ויניל','וודקה','וינה','וטרינר','ויטמין'],
+  'ז':['זמן','זהב','זרע','זמר','זית','זכרון','זנב','זוג','זיקוק','זירה','זכוכית','זרם','זרחן'],
+  'ח':['חיים','חיה','חלב','חוף','חורף','חום','חלל','חנות','חדש','חצי','חיטה','חמצן','חרב','חשמל','חלום'],
+  'ט':['טבע','טיול','טירה','טוב','טעם','טבלה','טיפה','טלה','טנק','טירוף','טלפון','טכנולוגיה'],
+  'י':['יום','ירח','ים','יד','יער','יין','ילד','יונה','יפה','ינשוף','יהלום','יסוד','יחסים','ירושלים','יקום'],
+  'כ':['כוכב','כלב','כדור','כיסא','כסף','כנף','כרם','כפר','כובע','כדורגל','כימיה','כלכלה','כלי','כנסת'],
+  'ל':['לב','לחם','לילה','לשון','לביא','לוח','לוויין','לחץ','לחימה','לימון','לנחל','לנאום'],
+  'מ':['מים','מלך','מדבר','מחשב','מרחב','מגדל','מוסיקה','מלאך','מסע','מטאור','מנוע','מסלול','מפה','מרכז'],
+  'נ':['נהר','נחש','נר','נשר','נמר','נוף','נגינה','ניצחון','נסיעה','נפט','נשימה','נפח','נוזל','נמל'],
+  'ס':['ספר','סוס','סלע','סוד','סיפור','ספינה','סירה','סחר','סדרה','סביבה','סוכר','סמל','סדר'],
+  'ע':['עץ','עין','עוף','ענן','עיר','עמק','עוגה','עשב','עגלה','עולם','עצם','עקרב','עשרה','עלה'],
+  'פ':['פרח','פיל','פרפר','פסל','פרי','פנס','פחד','פגישה','פלדה','פנים','פרוטה','פיזיקה'],
+  'צ':['ציפור','צבי','צבע','צמח','צהריים','ציור','צל','צוק','צבא','צופה','צמיד','צינור'],
+  'ק':['קשת','קוף','קול','קהל','קרן','קיץ','קרח','קמח','קצב','קרקע','קנה','קיטור','קליע'],
+  'ר':['רוח','ריח','ריצה','רגש','רחוב','רכב','ריקוד','ראש','רעם','רעיון','רמה','ריאה'],
+  'ש':['שמש','שמים','שיר','שדה','שנה','שקט','שפה','שלג','שרש','שרשרת','שעון','שבלול'],
+  'ת':['תפוח','תמר','תולעת','תכלת','תקוה','תנועה','תרבות','תשובה','תמונה','תהליך','תחנה'],
+};
+
+// נושאי מאמרים
+const TOPICS = [
+  {t:'כדור הארץ', c:'גאוגרפיה', d:'כוכב הלכת השלישי מהשמש, ביתם של כל היצורים החיים הידועים ביקום.'},
+  {t:'מים', c:'כימיה', d:'תרכובת כימית בעלת הנוסחה H₂O, חיונית לכל צורות החיים הידועות.'},
+  {t:'היקום', c:'אסטרונומיה', d:'מכלול כל החלל, הזמן, החומר והאנרגיה הקיימים.'},
+  {t:'ספר', c:'תרבות', d:'אוסף כתוב של דפים הכרוכים יחדיו, המשמש להעברת ידע ותרבות.'},
+  {t:'אריה', c:'בעלי חיים', d:'יונק גדול ממשפחת הפלידים, המוכר כ"מלך החיות".'},
+  {t:'גשם', c:'מטאורולוגיה', d:'משקעים בצורת טיפות מים הנופלות מהעננים אל פני הקרקע.'},
+  {t:'נהר', c:'גאוגרפיה', d:'זרם מים טבעי המתנקז לאגם, ים או אוקיינוס.'},
+  {t:'לב', c:'אנטומיה', d:'איבר שרירי הממוקם בחזה ומשמש כמשאבה להזרמת דם בגוף.'},
+  {t:'עץ', c:'בוטניקה', d:'צמח בעל גזע מעוצה וענפים המתרחב לכיוון האור.'},
+  {t:'רוח', c:'מטאורולוגיה', d:'תנועת אוויר אופקית ביחס לפני השטח של כדור הארץ.'},
+  {t:'שמש', c:'אסטרונומיה', d:'הכוכב במרכז מערכת השמש, מקור האור והחום לכדור הארץ.'},
+  {t:'ים', c:'גאוגרפיה', d:'גוף מים מלוחים גדול המכסה כ-71% משטח כדור הארץ.'},
+  {t:'ציפור', c:'זואולוגיה', d:'בעל חיים בעל נוצות, שתי כנפיים ושתי רגליים, השייך למחלקת העופות.'},
+  {t:'זמן', c:'פיזיקה', d:'מימד יסודי בו מתרחשים אירועים בסדר כרונולוגי מהעבר דרך ההווה אל העתיד.'},
+  {t:'מוסיקה', c:'אמנות', d:'אמנות הפקת צלילים מסודרים בהרמוניה וקצב ליצירת יצירה אמנותית.'},
+  {t:'הר', c:'גאוגרפיה', d:'תבליט טבעי של פני הארץ הבולט מעל הסביבה.'},
+  {t:'חשמל', c:'פיזיקה', d:'תופעה פיזיקלית הנובעת מנוכחות או תנועה של מטענים חשמליים.'},
+  {t:'אוויר', c:'כימיה', d:'תערובת גזים המרכיבים את האטמוספרה של כדור הארץ.'},
+  {t:'מחשב', c:'טכנולוגיה', d:'מכשיר אלקטרוני לעיבוד נתונים ובצוע חישובים.'},
+  {t:'דם', c:'ביולוגיה', d:'נוזל רקמה האוחז בתפקיד חיוני בהובלת חמצן וחומרי הזנה בגוף.'},
+];
+
+function startMagic() {
+  magicName = document.getElementById('nameInput').value.trim();
+  magicPos = parseInt(document.getElementById('posInput').value) || 3;
+  if (!magicName) { alert('נא להכניס שם!'); return; }
+  step = 0;
+  document.getElementById('setupScreen').style.display = 'none';
+}
+
+function goHome() {
+  document.getElementById('searchResults').style.display = 'none';
+  document.getElementById('articleArea').style.display = 'none';
+  document.getElementById('searchInput').value = '';
+}
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+  showSearchResults(q);
+}
+
+function showSearchResults(q) {
+  document.getElementById('articleArea').style.display = 'none';
+  document.getElementById('searchResults').style.display = 'block';
+  document.getElementById('srTitle').textContent = 'תוצאות חיפוש עבור "' + q + '"';
+
+  // בחר נושא אקראי לתוצאה הראשית
+  const topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
+  const neededLetter = step < magicName.length ? magicName[step] : magicName[magicName.length-1];
+  
+  // כותרת שמכילה את האות הנכונה במיקום הנכון
+  const magicTitle = buildTitle(q, neededLetter);
+
+  document.getElementById('srItems').innerHTML = `
+    <div class="result-item">
+      <h3><a onclick="openArticle('${magicTitle}')">${magicTitle}</a></h3>
+      <p>${magicTitle} — ${topic.d}</p>
+    </div>
+    <div class="result-item">
+      <h3><a href="#" onclick="return false;">${q} (היסטוריה)</a></h3>
+      <p>ראו גם: היסטוריה של ${q} לאורך הדורות והתפתחותו עד ימינו.</p>
+    </div>
+    <div class="result-item">
+      <h3><a href="#" onclick="return false;">${q} — מדע ומחקר</a></h3>
+      <p>מחקרים ומאמרים מדעיים בנושא ${q} מהשנים האחרונות.</p>
+    </div>
+  `;
+}
+
+function buildTitle(query, letter) {
+  // בנה כותרת שהאות שלה במיקום magicPos היא letter
+  // אם השאילתה עצמה מתאימה — השתמש בה
+  const q = query;
+  if (q.length >= magicPos && q[magicPos-1] === letter) return q;
+  
+  // אחרת בנה כותרת חדשה
+  const words = getWordsWithLetterAtPos(letter, magicPos);
+  if (words.length > 0) {
+    const w = words[Math.floor(Math.random() * words.length)];
+    // שלב עם השאילתה
+    if (Math.random() > 0.5) return w + ' ו' + query;
+    return query + ' ו' + w;
+  }
+  return query;
+}
+
+function getWordsWithLetterAtPos(letter, pos) {
+  const allWords = WORD_BANK[letter] || [];
+  return allWords.filter(w => w[pos-1] === letter);
+}
+
+function openArticle(title) {
+  document.getElementById('searchResults').style.display = 'none';
+  document.getElementById('articleArea').style.display = 'flex';
+  document.getElementById('artTitle').textContent = title;
+  
+  const neededLetter = step < magicName.length ? magicName[step] : magicName[magicName.length-1];
+  const nextLetter = (step+1) < magicName.length ? magicName[step+1] : null;
+  
+  document.getElementById('artBody').innerHTML = buildArticle(title, neededLetter, nextLetter);
+  step++;
+  window.scrollTo(0,0);
+}
+
+function buildArticle(title, currentLetter, nextLetter) {
+  // מצא מילים שהאות הנכונה נמצאת במיקום הנכון
+  const magicWords = getWordsWithLetterAtPos(currentLetter, magicPos);
+  const magicWord = magicWords[Math.floor(Math.random() * magicWords.length)] || currentLetter + 'ות';
+
+  // קישורים לערך הבא — מכילים מילה עם האות הנכונה הבאה
+  let linkWords = [];
+  if (nextLetter) {
+    linkWords = getWordsWithLetterAtPos(nextLetter, magicPos);
+  }
+  const link1 = linkWords[0] || 'מדע';
+  const link2 = linkWords[1] || 'טבע';
+  const link3 = linkWords[2] || 'חיים';
+  const link4 = linkWords[3] || 'עולם';
+
+  // טופיק אקראי לאינפובוקס
+  const topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
+
+  return `
+    <div class="infobox">
+      <div class="infobox-title">${title}</div>
+      <div class="infobox-img"></div>
+      <div class="infobox-row"><span class="infobox-label">סוג</span><span>${topic.c}</span></div>
+      <div class="infobox-row"><span class="infobox-label">קטגוריה</span><span>כללי</span></div>
+    </div>
+
+    <p><b>${title}</b> ${topic.d} ${title} נחקר רבות לאורך ההיסטוריה ונמצא קשור לתחומים רבים של הידע האנושי.</p>
+
+    <p>מחקרים שנערכו בנושא <span class="magic-highlight">${magicWord}</span> מראים כי הקשר בין ${title} לבין תופעות טבע שונות הוא עמוק ורב-פנים. 
+    חוקרים מרחבי העולם מוצאים עניין רב בתחום זה.</p>
+
+    <h2>היסטוריה</h2>
+    <p>כבר בתקופה העתיקה עסקו האנשים ב${title}. 
+    הידע הצטבר לאורך דורות רבים והועבר מדור לדור דרך כתבים, סיפורים ומסורות.</p>
+    
+    <p>במאה ה-19 חל שינוי מהפכני בהבנת ${title}, כאשר מדענים החלו לחקור את הנושא בשיטות מודרניות. 
+    תגליות חשובות שנעשו בתקופה זו שינו את תפיסתנו ביחס ל<a onclick="openArticle('${link1}')">${link1}</a> ו<a onclick="openArticle('${link2}')">${link2}</a>.</p>
+
+    <h2>מאפיינים עיקריים</h2>
+    <p>${title} מתאפיין במספר תכונות ייחודיות. ראשית, הקשר שלו עם <a onclick="openArticle('${link3}')">${link3}</a> הוא בלתי ניתן לניתוק. 
+    שנית, השפעתו על <a onclick="openArticle('${link4}')">${link4}</a> ניכרת בכל תחומי החיים.</p>
+
+    <p>חוקרים רבים סבורים כי הבנת ${title} לעומק היא מפתח להבנת העולם הסובב אותנו. 
+    המחקרים בתחום זה ממשיכים להתפתח ולהרחיב את גבולות הידע האנושי.</p>
+
+    <h2>ראו גם</h2>
+    <p>
+      <a onclick="openArticle('${link1}')">${link1}</a> · 
+      <a onclick="openArticle('${link2}')">${link2}</a> · 
+      <a onclick="openArticle('${link3}')">${link3}</a> · 
+      <a onclick="openArticle('${link4}')">${link4}</a>
+    </p>
+
+    <h2>קישורים חיצוניים</h2>
+    <p>
+      <a href="#" onclick="return false;">אנציקלופדיה בריטניקה — ${title}</a><br>
+      <a href="#" onclick="return false;">מחקרים אקדמיים בנושא ${title}</a>
+    </p>
+
+    <div style="margin-top:20px;padding-top:8px;border-top:1px solid #a2a9b1;font-size:12px;color:#54595d;">
+      דף זה שוכלל לאחרונה ב-${new Date().toLocaleDateString('he-IL')} · 
+      <a href="#" onclick="return false;">תרמו לוויקיפדיה</a>
+    </div>
+  `;
+}
+
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+</script>
+</body>
+</html>
