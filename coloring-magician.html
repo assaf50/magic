@@ -3,54 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎩</title>
+<title>🎩 מסך הקוסם</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
-    background:#0f0f0f;
+    background:#000;
     min-height:100vh;
     display:flex;
     align-items:center;
     justify-content:center;
   }
-
-  .waiting {
-    color:#333;
-    font-family:sans-serif;
-    font-size:18px;
-  }
-
   .figure-wrap {
-    display:none;
     width:260px;
     height:420px;
+    opacity:0;
+    transition:opacity 0.5s;
   }
+  .figure-wrap.visible { opacity:1; }
   .figure-wrap svg { width:100%; height:100%; }
-
-  .reset-btn {
-    position:fixed;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    padding:10px 20px;
-    background:#222;
-    color:#444;
-    border:none;
-    border-radius:10px;
-    font-size:13px;
-    cursor:pointer;
-    font-family:sans-serif;
-  }
 </style>
 </head>
 <body>
 
-<div class="waiting" id="waiting">⏳</div>
-
 <div class="figure-wrap" id="figureWrap">
   <svg viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="100" cy="45" rx="32" ry="38" fill="#f5c5a3" stroke="#555" stroke-width="1"/>
-    <ellipse cx="100" cy="20" rx="32" ry="18" fill="#333"/>
+    <ellipse cx="100" cy="45" rx="32" ry="38" fill="#f5c5a3" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="100" cy="20" rx="32" ry="18" fill="#555"/>
     <circle cx="88" cy="40" r="4" fill="#222"/>
     <circle cx="112" cy="40" r="4" fill="#222"/>
     <circle cx="89" cy="39" r="1.5" fill="#fff"/>
@@ -58,20 +36,18 @@
     <ellipse cx="100" cy="52" rx="4" ry="3" fill="#e8a882"/>
     <path d="M88 62 Q100 70 112 62" stroke="#c0704a" stroke-width="2" fill="none" stroke-linecap="round"/>
     <rect x="88" y="80" width="24" height="18" fill="#f5c5a3"/>
-    <path id="jacket" d="M50 98 L70 95 L100 105 L130 95 L150 98 L158 200 L42 200 Z" fill="#1a1a2e" stroke="#555" stroke-width="1"/>
-    <path id="shirt" d="M72 97 L100 107 L128 97 L132 200 L68 200 Z" fill="#4a90d9" stroke="#555" stroke-width="1"/>
-    <path id="tie" d="M96 100 L104 100 L108 160 L100 170 L92 160 Z" fill="#e74c3c" stroke="#555" stroke-width="1"/>
-    <path id="pants" d="M60 198 L140 198 L145 290 L108 290 L100 250 L92 290 L55 290 Z" fill="#2c3e50" stroke="#555" stroke-width="1"/>
-    <ellipse id="shoe-left" cx="68" cy="296" rx="18" ry="10" fill="#1a1a1a" stroke="#555" stroke-width="1"/>
-    <ellipse id="shoe-right" cx="132" cy="296" rx="18" ry="10" fill="#1a1a1a" stroke="#555" stroke-width="1"/>
-    <path d="M52 100 L30 170 L44 174 L62 110 Z" id="jacket-left" fill="#1a1a2e" stroke="#555" stroke-width="1"/>
-    <path d="M148 100 L170 170 L156 174 L138 110 Z" id="jacket-right" fill="#1a1a2e" stroke="#555" stroke-width="1"/>
+    <path id="jacket" d="M50 98 L70 95 L100 105 L130 95 L150 98 L158 200 L42 200 Z" fill="#1a1a2e" stroke="#333" stroke-width="1.5"/>
+    <path id="shirt" d="M72 97 L100 107 L128 97 L132 200 L68 200 Z" fill="#4a90d9" stroke="#333" stroke-width="1.5"/>
+    <path id="tie" d="M96 100 L104 100 L108 160 L100 170 L92 160 Z" fill="#e74c3c" stroke="#333" stroke-width="1.5"/>
+    <path id="pants" d="M60 198 L140 198 L145 290 L108 290 L100 250 L92 290 L55 290 Z" fill="#2c3e50" stroke="#333" stroke-width="1.5"/>
+    <ellipse id="shoe-left" cx="68" cy="296" rx="18" ry="10" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+    <ellipse id="shoe-right" cx="132" cy="296" rx="18" ry="10" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+    <path d="M52 100 L30 170 L44 174 L62 110 Z" fill="#1a1a2e" stroke="#333" stroke-width="1.5"/>
+    <path d="M148 100 L170 170 L156 174 L138 110 Z" fill="#1a1a2e" stroke="#333" stroke-width="1.5"/>
     <ellipse cx="37" cy="176" rx="10" ry="8" fill="#f5c5a3"/>
     <ellipse cx="163" cy="176" rx="10" ry="8" fill="#f5c5a3"/>
   </svg>
 </div>
-
-<button class="reset-btn" onclick="resetView()">איפוס</button>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -83,40 +59,27 @@
   };
 
   firebase.initializeApp({
-    apiKey: "AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
-    authDomain: "assafma-f409e.firebaseapp.com",
-    databaseURL: "https://assafma-f409e-default-rtdb.firebaseio.com",
-    projectId: "assafma-f409e",
-    storageBucket: "assafma-f409e.firebasestorage.app",
-    messagingSenderId: "665696235616",
-    appId: "1:665696235616:web:06fff6145f50c10dcfd305"
+    apiKey:"AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
+    authDomain:"assafma-f409e.firebaseapp.com",
+    databaseURL:"https://assafma-f409e-default-rtdb.firebaseio.com",
+    projectId:"assafma-f409e",
+    storageBucket:"assafma-f409e.firebasestorage.app",
+    messagingSenderId:"665696235616",
+    appId:"1:665696235616:web:06fff6145f50c10dcfd305"
   });
 
   firebase.database().ref('magic/coloring').on('value', snap => {
     const data = snap.val();
     if (!data) return;
-
     const c = data.colors;
-    const hex = n => COLOR_HEX[n] || '#888';
-
-    document.getElementById('jacket').setAttribute('fill', hex(c.jacket));
-    document.getElementById('jacket-left').setAttribute('fill', hex(c.jacket));
-    document.getElementById('jacket-right').setAttribute('fill', hex(c.jacket));
-    document.getElementById('shirt').setAttribute('fill', hex(c.shirt));
-    document.getElementById('tie').setAttribute('fill', hex(c.tie));
-    document.getElementById('pants').setAttribute('fill', hex(c.pants));
-    document.getElementById('shoe-left').setAttribute('fill', hex(c.shoes));
-    document.getElementById('shoe-right').setAttribute('fill', hex(c.shoes));
-
-    document.getElementById('waiting').style.display = 'none';
-    document.getElementById('figureWrap').style.display = 'block';
+    document.getElementById('jacket').setAttribute('fill', COLOR_HEX[c.jacket]||'#888');
+    document.getElementById('shirt').setAttribute('fill', COLOR_HEX[c.shirt]||'#888');
+    document.getElementById('tie').setAttribute('fill', COLOR_HEX[c.tie]||'#888');
+    document.getElementById('pants').setAttribute('fill', COLOR_HEX[c.pants]||'#888');
+    document.getElementById('shoe-left').setAttribute('fill', COLOR_HEX[c.shoes]||'#888');
+    document.getElementById('shoe-right').setAttribute('fill', COLOR_HEX[c.shoes]||'#888');
+    document.getElementById('figureWrap').classList.add('visible');
   });
-
-  function resetView() {
-    firebase.database().ref('magic/coloring').remove();
-    document.getElementById('waiting').style.display = 'block';
-    document.getElementById('figureWrap').style.display = 'none';
-  }
 </script>
 </body>
 </html>
