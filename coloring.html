@@ -28,30 +28,7 @@
   }
 
   /* CHARACTER SELECTOR */
-  .char-selector {
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    justify-content:center;
-    padding:0 16px 16px;
-  }
 
-  .char-btn {
-    padding:8px 16px;
-    border-radius:20px;
-    border:2px solid #333;
-    background:#1a1a1a;
-    color:#aaa;
-    font-family:'Rubik',sans-serif;
-    font-size:14px;
-    cursor:pointer;
-    transition:all 0.2s;
-  }
-  .char-btn.active {
-    border-color:#ffd200;
-    color:#ffd200;
-    background:#2a2200;
-  }
 
   /* MAIN AREA */
   .main {
@@ -184,14 +161,7 @@
 
 <h1>🎨 קסם הצבעים</h1>
 
-<!-- Character selector -->
-<div class="char-selector">
-  <button class="char-btn active" onclick="selectChar('bibi')">ביבי</button>
-  <button class="char-btn" onclick="selectChar('trump')">טראמפ</button>
-  <button class="char-btn" onclick="selectChar('lapid')">לפיד</button>
-  <button class="char-btn" onclick="selectChar('bengvir')">בן גביר</button>
-  <button class="char-btn" onclick="selectChar('omer')">עומר אדם</button>
-</div>
+
 
 <div class="main">
 
@@ -284,18 +254,10 @@
     shoes:  {label:'נעלים', elements:['shoe-left','shoe-right']},
   };
 
-  const CHARS = {
-    bibi:    {name:'ביבי נתניהו', hair:'#888', skin:'#f5c5a3'},
-    trump:   {name:'דונלד טראמפ', hair:'#DAA520', skin:'#f0a060'},
-    lapid:   {name:'יאיר לפיד', hair:'#ccc', skin:'#f5c5a3'},
-    bengvir: {name:'איתמר בן גביר', hair:'#1a1a1a', skin:'#f5c5a3'},
-    omer:    {name:'עומר אדם', hair:'#111', skin:'#c68642'},
-  };
-
   let selectedZone = null;
   let selectedColor = null;
   let chosen = {}; // zone -> {hex, name}
-  let currentChar = 'bibi';
+
 
   // Build color dots
   const picker = document.getElementById('colorPicker');
