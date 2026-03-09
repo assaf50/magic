@@ -133,10 +133,10 @@
 <body>
 
 <h1>🤫 מסך העוזר</h1>
-<p class="sub">שמע את המספרים → לחץ שלח → המחשבון של אסף מתעדכן!</p>
+<p class="sub">שמע את המספרים → לחץ שלח → המחשבון של דודו מתעדכן!</p>
 
 <div class="card">
-  <span class="label">🎯 מספר יעד (זהה לאסף)</span>
+  <span class="label">🎯 מספר יעד (זהה לדודו)</span>
   <input type="number" id="target" value="1000" oninput="recalc()" />
 </div>
 
@@ -165,18 +165,18 @@
     <div class="stat-val" id="targetVal">1000</div>
   </div>
   <div class="stat">
-    <div class="stat-label">מספר אסף</div>
+    <div class="stat-label">מספר דודו</div>
     <div class="stat-val green" id="myNumVal">—</div>
   </div>
 </div>
 
 <div class="sent-box" id="sentBox">
   <div class="big" id="sentVal">—</div>
-  <div class="msg">✅ נשלח! המחשבון של אסף התעדכן</div>
+  <div class="msg">✅ נשלח! המחשבון של דודו התעדכן</div>
 </div>
 
 <button class="send-btn" id="sendBtn" onclick="doSend()" disabled>
-  📡 שלח למחשבון של אסף!
+  📡 שלח למחשבון של דודו!
 </button>
 
 <button class="reset-btn" onclick="reset()">🔄 איפוס</button>
@@ -196,7 +196,7 @@
     document.getElementById('myNumVal').textContent = filled > 0 ? myNum : '—';
     const btn = document.getElementById('sendBtn');
     btn.disabled = !(filled > 0 && target > 0);
-    btn.textContent = filled > 0 ? `📡 שלח ${myNum} למחשבון של אסף!` : '📡 שלח למחשבון של אסף!';
+    btn.textContent = filled > 0 ? `📡 שלח ${myNum} למחשבון של דודו!` : '📡 שלח למחשבון של דודו!';
     document.getElementById('sentBox').style.display = 'none';
   }
 
