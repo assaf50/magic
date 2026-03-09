@@ -28,13 +28,10 @@ body { font-family:'Linux Libertine','Georgia','Times',serif; font-size:14px; co
 .article-text p { margin-bottom:10px; }
 .article-text h2 { font-family:'Linux Libertine',Georgia,serif; font-size:20px; font-weight:normal; border-bottom:1px solid #a2a9b1; padding-bottom:3px; margin:16px 0 8px; }
 .article-text h3 { font-size:16px; margin:12px 0 6px; }
-
-/* קישורים לחיצים - אות נכונה */
-.article-text a.magic-link { color:#0645ad; text-decoration:none; cursor:pointer; }
-.article-text a.magic-link:hover { text-decoration:underline; background:#e8f4fd; }
-
-/* קישורים לא לחיצים - אות שגויה */
-.article-text a.dead-link { color:#0645ad; text-decoration:none; cursor:default; pointer-events:none; }
+.article-text a { color:#0645ad; text-decoration:none; }
+.article-text a.magic-link { cursor:pointer; }
+.article-text a.magic-link:hover { text-decoration:underline; background:#e8f4fd; border-radius:2px; }
+.article-text a.dead-link { cursor:default; pointer-events:none; }
 
 .search-results { display:none; padding:12px 16px; max-width:960px; margin:0 auto; }
 .search-results h2 { font-size:22px; font-weight:normal; font-family:'Linux Libertine',Georgia,serif; margin-bottom:12px; border-bottom:1px solid #a2a9b1; padding-bottom:6px; }
@@ -47,49 +44,43 @@ body { font-family:'Linux Libertine','Georgia','Times',serif; font-size:14px; co
 .sidebar-box { border:1px solid #a2a9b1; margin-bottom:12px; }
 .sidebar-title { background:#cee0f2; padding:4px 8px; font-weight:bold; font-size:12px; }
 .sidebar-links { padding:6px 8px; }
-.sidebar-links a { display:block; color:#0645ad; text-decoration:none; padding:2px 0; }
+.sidebar-links a { display:block; color:#0645ad; text-decoration:none; padding:2px 0; font-size:12px; }
 
 .loading { text-align:center; padding:40px; color:#54595d; font-size:16px; }
 
-/* SETUP */
 .setup-overlay { position:fixed; top:0;left:0;width:100%;height:100%; background:rgba(0,0,0,0.88); display:flex; align-items:center; justify-content:center; z-index:1000; }
 .setup-box { background:#fff; border-radius:16px; padding:28px 24px; width:90%; max-width:340px; text-align:center; direction:rtl; }
 .setup-box h2 { font-size:20px; margin-bottom:6px; font-family:sans-serif; }
-.setup-box p { font-size:13px; color:#666; margin-bottom:20px; font-family:sans-serif; }
+.setup-box p { font-size:13px; color:#666; margin-bottom:20px; font-family:sans-serif; line-height:1.5; }
 .setup-label { font-size:13px; color:#444; margin-bottom:6px; text-align:right; font-family:sans-serif; font-weight:bold; }
 .setup-input { width:100%; padding:12px; border:2px solid #ddd; border-radius:8px; font-size:20px; text-align:center; margin-bottom:14px; font-family:inherit; direction:rtl; }
 .setup-input:focus { border-color:#0645ad; outline:none; }
 .setup-btn { width:100%; padding:14px; background:#0645ad; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; font-family:sans-serif; }
-.setup-btn:hover { background:#0533a0; }
 
-/* מד התקדמות */
-.progress-bar { position:fixed; top:0; left:0; width:100%; height:4px; background:#eaecf0; z-index:500; }
-.progress-fill { height:4px; background:#0645ad; transition:width 0.5s; }
+.progress-bar { position:fixed; top:0; left:0; width:100%; height:5px; background:#eaecf0; z-index:500; display:none; }
+.progress-fill { height:5px; background:#3ea6ff; transition:width 0.5s; }
 
 @media(max-width:600px) { .wiki-sidebar{display:none} .article-title{font-size:20px} }
 </style>
 </head>
 <body>
 
-<!-- SETUP -->
 <div class="setup-overlay" id="setupScreen">
   <div class="setup-box">
     <h2>🎩 הגדרת הקסם</h2>
-    <p>הקהל יגלוש בוויקיפדיה חופשי — רק הקישורים עם האות הנכונה יהיו לחיצים!</p>
-    <div class="setup-label">שם הצופה (עברית):</div>
+    <p>הקהל גולש חופשי בוויקיפדיה — רק הקישורים עם האות הנכונה לחיצים!</p>
+    <div class="setup-label">שם הצופה:</div>
     <input class="setup-input" id="nameInput" placeholder="רותם" maxlength="10" dir="rtl"/>
     <div class="setup-label">המספר שנבחר (1-6):</div>
     <input class="setup-input" id="posInput" type="number" min="1" max="6" placeholder="4"/>
-    <button class="setup-btn" onclick="startMagic()">התחל קסם ▶</button>
+    <button class="setup-btn" onclick="startMagic()">התחל ▶</button>
   </div>
 </div>
 
-<!-- PROGRESS -->
-<div class="progress-bar" id="progressBar" style="display:none">
+<div class="progress-bar" id="progressBar">
   <div class="progress-fill" id="progressFill" style="width:0%"></div>
 </div>
 
-<!-- HEADER -->
 <div class="wiki-top">
   <div style="display:flex;gap:10px"><a href="#">צור חשבון</a> · <a href="#">כניסה לחשבון</a></div>
   <div><a href="#">תרומות</a> · <a href="#">דף שיחה</a></div>
@@ -116,13 +107,11 @@ body { font-family:'Linux Libertine','Georgia','Times',serif; font-size:14px; co
   <span class="wiki-tab">היסטוריה</span>
 </div>
 
-<!-- SEARCH RESULTS -->
 <div class="search-results" id="searchResults">
   <h2 id="srTitle"></h2>
   <div id="srItems"></div>
 </div>
 
-<!-- ARTICLE -->
 <div class="wiki-content" id="articleArea" style="display:none">
   <div class="wiki-main">
     <h1 class="article-title" id="artTitle"></h1>
@@ -150,16 +139,15 @@ body { font-family:'Linux Libertine','Georgia','Times',serif; font-size:14px; co
 </div>
 
 <script>
-// ===== STATE =====
 let magicName = '';
 let magicPos = 3;
 let currentStep = 0;
+const SKIP = ['קובץ:','ויקיפדיה:','עזרה:','קטגוריה:','שיחה:','משתמש:','File:','Wikipedia:','Template:','תבנית:','Help:','Category:','Special:','מיוחד:'];
 
 function startMagic() {
   magicName = document.getElementById('nameInput').value.trim();
   magicPos = parseInt(document.getElementById('posInput').value) || 3;
   if (!magicName) { alert('נא להכניס שם!'); return; }
-  if (magicPos < 1 || magicPos > 6) { alert('מיקום בין 1-6!'); return; }
   currentStep = 0;
   document.getElementById('setupScreen').style.display = 'none';
   document.getElementById('progressBar').style.display = 'block';
@@ -177,42 +165,30 @@ function goHome() {
   document.getElementById('searchInput').value = '';
 }
 
-// ===== SEARCH =====
 async function doSearch() {
   const q = document.getElementById('searchInput').value.trim();
   if (!q) return;
-
   document.getElementById('articleArea').style.display = 'none';
   document.getElementById('searchResults').style.display = 'block';
   document.getElementById('srTitle').textContent = 'מחפש "' + q + '"...';
   document.getElementById('srItems').innerHTML = '<div class="loading">⏳ טוען...</div>';
-
   try {
     const url = `https://he.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&srlimit=6&format=json&origin=*`;
     const res = await fetch(url);
     const data = await res.json();
     const results = data.query.search;
-
     document.getElementById('srTitle').textContent = 'תוצאות חיפוש עבור "' + q + '"';
-
-    if (!results.length) {
-      document.getElementById('srItems').innerHTML = '<p>לא נמצאו תוצאות.</p>';
-      return;
-    }
-
+    if (!results.length) { document.getElementById('srItems').innerHTML = '<p>לא נמצאו תוצאות.</p>'; return; }
     document.getElementById('srItems').innerHTML = results.map(r => `
       <div class="result-item">
-        <h3><a onclick="openArticle('${r.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">${r.title}</a></h3>
+        <h3><a href="#" onclick="openArticle(${JSON.stringify(r.title)});return false;">${r.title}</a></h3>
         <p>${r.snippet.replace(/<[^>]+>/g,'').substring(0,180)}...</p>
-      </div>
-    `).join('');
-
+      </div>`).join('');
   } catch(e) {
     document.getElementById('srItems').innerHTML = '<p>שגיאה. נסה שוב.</p>';
   }
 }
 
-// ===== ARTICLE =====
 async function openArticle(title) {
   document.getElementById('searchResults').style.display = 'none';
   document.getElementById('articleArea').style.display = 'flex';
@@ -225,60 +201,63 @@ async function openArticle(title) {
     const url = `https://he.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=text&format=json&origin=*`;
     const res = await fetch(url);
     const data = await res.json();
+    if (data.error) { document.getElementById('artBody').innerHTML = '<p>הערך לא נמצא.</p>'; return; }
 
-    if (data.error) {
-      document.getElementById('artBody').innerHTML = '<p>הערך לא נמצא.</p>';
-      return;
-    }
+    // הכנס את ה-HTML לתוך div זמני
+    const tmp = document.createElement('div');
+    tmp.innerHTML = data.parse.text['*'];
 
-    // קבל את האות הנוכחית שצריך
+    // עבד כל הקישורים ב-DOM — לא בטקסט!
     const neededLetter = currentStep < magicName.length ? magicName[currentStep] : null;
 
-    let html = data.parse.text['*'];
+    tmp.querySelectorAll('a').forEach(a => {
+      const href = a.getAttribute('href') || '';
 
-    // הסר href מסוכנים שיוצאים מהאתר
-    html = html.replace(/href="\/w\/[^"]*"/g, 'href="#" onclick="return false;"');
-    html = html.replace(/href="\/wiki\/(קובץ|File|ויקיפדיה|Wikipedia|עזרה|Help|קטגוריה|Category|תבנית|Template|שיחה|Talk|משתמש|User)[^"]*"/g, 'href="#" onclick="return false;"');
+      // נטרל הכל מלבד /wiki/
+      if (!href.startsWith('/wiki/')) {
+        a.removeAttribute('href');
+        a.style.cursor = 'default';
+        return;
+      }
 
-    // נטרל את כל הקישורים שיוצאים מהאתר
-    html = html.replace(/href="\/w\/[^"]*"/g, 'href="#" onclick="return false;"');
-    html = html.replace(/href="https?:\/\/[^"]*"/g, 'href="#" onclick="return false;"');
+      // חלץ שם הדף
+      const rawPage = href.replace('/wiki/', '');
+      const page = decodeURIComponent(rawPage).replace(/_/g, ' ');
 
-    // עיבוד קישורים — רק קישורים עם האות הנכונה במיקום magicPos יהיו לחיצים
-    html = html.replace(/href="\/wiki\/([^"#]+)"/g, (match, rawPage) => {
-      const page = decodeURIComponent(rawPage).replace(/_/g,' ');
-      
-      // התעלם מקישורי מטא
-      if (page.startsWith('קובץ:') || page.startsWith('ויקיפדיה:') || 
-          page.startsWith('עזרה:') || page.startsWith('קטגוריה:') ||
-          page.startsWith('שיחה:') || page.startsWith('משתמש:') ||
-          page.startsWith('File:') || page.startsWith('Wikipedia:') ||
-          page.startsWith('Template:') || page.startsWith('תבנית:')) {
-        return 'href="#" onclick="return false;"';
+      // נטרל קישורי מטא
+      if (SKIP.some(s => page.startsWith(s))) {
+        a.removeAttribute('href');
+        a.style.cursor = 'default';
+        return;
       }
 
       if (!neededLetter) {
-        // הקסם נגמר — כל הקישורים רגילים
-        return `href="#" onclick="openArticle('${page.replace(/'/g,"\\'").replace(/\n/g,'')}');return false;"`;
+        // הקסם נגמר — הכל לחיץ
+        a.href = '#';
+        a.onclick = (e) => { e.preventDefault(); openArticle(page); };
+        return;
       }
 
-      // בדוק אם האות במיקום הנכון תואמת
+      // בדוק האות במיקום
       const letter = page[magicPos - 1];
       if (letter === neededLetter) {
-        // ✅ קישור לחיץ — האות נכונה
-        const safeTitle = page.replace(/'/g,"\\'").replace(/\n/g,'');
-        return `href="#" onclick="advanceStep('${safeTitle}');return false;" class="magic-link"`;
+        // ✅ לחיץ
+        a.href = '#';
+        a.className = 'magic-link';
+        a.onclick = (e) => { e.preventDefault(); advanceStep(page); };
       } else {
-        // ❌ קישור מת — האות שגויה
-        return `href="#" onclick="return false;" class="dead-link"`;
+        // ❌ מת
+        a.removeAttribute('href');
+        a.className = 'dead-link';
+        a.style.cursor = 'default';
+        a.style.pointerEvents = 'none';
       }
     });
 
-    // נקה קישורים חיצוניים ועריכה
-    html = html.replace(/class="mw-editsection[^"]*"[^>]*>[\s\S]*?<\/span><\/span>/g,'');
-    html = html.replace(/<a[^>]*href="(https?:|\/\/)[^"]*"[^>]*>([\s\S]*?)<\/a>/g,'$2');
+    // הסר כפתורי עריכה
+    tmp.querySelectorAll('.mw-editsection').forEach(el => el.remove());
 
-    document.getElementById('artBody').innerHTML = html;
+    document.getElementById('artBody').innerHTML = tmp.innerHTML;
 
     // תקן תמונות
     document.querySelectorAll('#artBody img').forEach(img => {
@@ -291,19 +270,11 @@ async function openArticle(title) {
   }
 }
 
-// ===== ADVANCE =====
 function advanceStep(title) {
   currentStep++;
   updateProgress();
   openArticle(title);
 }
-
-// חיפוש עם Enter
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('searchInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doSearch();
-  });
-});
 </script>
 </body>
 </html>
