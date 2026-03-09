@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ויקיפדיה - האנציקלופדיה החופשית</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Linux Libertine','Georgia','Times',serif; font-size:14px; color:#202122; background:#fff; direction:rtl; }
+
+.wiki-top { display:flex; justify-content:space-between; padding:4px 12px; background:#f8f9fa; border-bottom:1px solid #eaecf0; font-size:12px; }
+.wiki-top a { color:#0645ad; text-decoration:none; }
+.wiki-logo-bar { display:flex; align-items:center; padding:8px 12px; gap:12px; border-bottom:1px solid #eaecf0; }
+.wiki-logo { display:flex; align-items:center; gap:8px; text-decoration:none; cursor:pointer; }
+.wiki-logo-text { font-family:'Linux Libertine',Georgia,serif; font-size:20px; color:#000; }
+.wiki-logo-sub { font-size:11px; color:#54595d; }
+.search-bar { display:flex; flex:1; max-width:400px; margin-right:auto; }
+.search-input { flex:1; padding:6px 10px; border:1px solid #a2a9b1; border-radius:2px 0 0 2px; font-size:13px; outline:none; font-family:inherit; }
+.search-btn { padding:6px 12px; background:#f8f9fa; border:1px solid #a2a9b1; border-right:none; border-radius:0 2px 2px 0; cursor:pointer; }
+.wiki-tabs { display:flex; border-bottom:1px solid #a2a9b1; padding:0 12px; background:#f8f9fa; font-size:13px; }
+.wiki-tab { padding:6px 14px; color:#0645ad; border:1px solid transparent; border-bottom:none; margin-bottom:-1px; cursor:pointer; }
+.wiki-tab.active { background:#fff; border-color:#a2a9b1; color:#202122; }
+
+.wiki-content { max-width:960px; margin:0 auto; padding:12px 16px; display:flex; gap:20px; }
+.wiki-main { flex:1; min-width:0; }
+.article-title { font-family:'Linux Libertine',Georgia,serif; font-size:28px; font-weight:normal; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:12px; }
+.article-text { line-height:1.8; font-size:14px; }
+.article-text p { margin-bottom:10px; }
+.article-text h2 { font-family:'Linux Libertine',Georgia,serif; font-size:20px; font-weight:normal; border-bottom:1px solid #a2a9b1; padding-bottom:3px; margin:16px 0 8px; }
+.article-text h3 { font-size:16px; margin:12px 0 6px; }
+
+/* קישורים לחיצים - אות נכונה */
+.article-text a.magic-link { color:#0645ad; text-decoration:none; cursor:pointer; }
+.article-text a.magic-link:hover { text-decoration:underline; background:#e8f4fd; }
+
+/* קישורים לא לחיצים - אות שגויה */
+.article-text a.dead-link { color:#0645ad; text-decoration:none; cursor:default; pointer-events:none; }
+
+.search-results { display:none; padding:12px 16px; max-width:960px; margin:0 auto; }
+.search-results h2 { font-size:22px; font-weight:normal; font-family:'Linux Libertine',Georgia,serif; margin-bottom:12px; border-bottom:1px solid #a2a9b1; padding-bottom:6px; }
+.result-item { margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid #eaecf0; }
+.result-item h3 a { color:#0645ad; font-size:17px; text-decoration:none; cursor:pointer; }
+.result-item h3 a:hover { text-decoration:underline; }
+.result-item p { font-size:13px; color:#54595d; margin-top:4px; line-height:1.5; }
+
+.wiki-sidebar { width:180px; flex-shrink:0; font-size:12px; }
+.sidebar-box { border:1px solid #a2a9b1; margin-bottom:12px; }
+.sidebar-title { background:#cee0f2; padding:4px 8px; font-weight:bold; font-size:12px; }
+.sidebar-links { padding:6px 8px; }
+.sidebar-links a { display:block; color:#0645ad; text-decoration:none; padding:2px 0; }
+
+.loading { text-align:center; padding:40px; color:#54595d; font-size:16px; }
+
+/* SETUP */
+.setup-overlay { position:fixed; top:0;left:0;width:100%;height:100%; background:rgba(0,0,0,0.88); display:flex; align-items:center; justify-content:center; z-index:1000; }
+.setup-box { background:#fff; border-radius:16px; padding:28px 24px; width:90%; max-width:340px; text-align:center; direction:rtl; }
+.setup-box h2 { font-size:20px; margin-bottom:6px; font-family:sans-serif; }
+.setup-box p { font-size:13px; color:#666; margin-bottom:20px; font-family:sans-serif; }
+.setup-label { font-size:13px; color:#444; margin-bottom:6px; text-align:right; font-family:sans-serif; font-weight:bold; }
+.setup-input { width:100%; padding:12px; border:2px solid #ddd; border-radius:8px; font-size:20px; text-align:center; margin-bottom:14px; font-family:inherit; direction:rtl; }
+.setup-input:focus { border-color:#0645ad; outline:none; }
+.setup-btn { width:100%; padding:14px; background:#0645ad; color:#fff; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; font-family:sans-serif; }
+.setup-btn:hover { background:#0533a0; }
+
+/* מד התקדמות */
+.progress-bar { position:fixed; top:0; left:0; width:100%; height:4px; background:#eaecf0; z-index:500; }
+.progress-fill { height:4px; background:#0645ad; transition:width 0.5s; }
+
+@media(max-width:600px) { .wiki-sidebar{display:none} .article-title{font-size:20px} }
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div class="setup-overlay" id="setupScreen">
+  <div class="setup-box">
+    <h2>🎩 הגדרת הקסם</h2>
+    <p>הקהל יגלוש בוויקיפדיה חופשי — רק הקישורים עם האות הנכונה יהיו לחיצים!</p>
+    <div class="setup-label">שם הצופה (עברית):</div>
+    <input class="setup-input" id="nameInput" placeholder="רותם" maxlength="10" dir="rtl"/>
+    <div class="setup-label">המספר שנבחר (1-6):</div>
+    <input class="setup-input" id="posInput" type="number" min="1" max="6" placeholder="4"/>
+    <button class="setup-btn" onclick="startMagic()">התחל קסם ▶</button>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar" id="progressBar" style="display:none">
+  <div class="progress-fill" id="progressFill" style="width:0%"></div>
+</div>
+
+<!-- HEADER -->
+<div class="wiki-top">
+  <div style="display:flex;gap:10px"><a href="#">צור חשבון</a> · <a href="#">כניסה לחשבון</a></div>
+  <div><a href="#">תרומות</a> · <a href="#">דף שיחה</a></div>
+</div>
+<div class="wiki-logo-bar">
+  <div class="wiki-logo" onclick="goHome()">
+    <svg width="50" height="50" viewBox="0 0 50 50">
+      <circle cx="25" cy="25" r="23" fill="none" stroke="#a2a9b1" stroke-width="1.5"/>
+      <text x="25" y="22" text-anchor="middle" font-size="14" fill="#202122" font-family="Georgia,serif">W</text>
+      <text x="25" y="33" text-anchor="middle" font-size="7" fill="#54595d" font-family="sans-serif">IKIPEDIA</text>
+    </svg>
+    <div><div class="wiki-logo-text">ויקיפדיה</div><div class="wiki-logo-sub">האנציקלופדיה החופשית</div></div>
+  </div>
+  <div class="search-bar">
+    <input class="search-input" id="searchInput" placeholder="חיפוש בוויקיפדיה" onkeydown="if(event.key==='Enter')doSearch()"/>
+    <button class="search-btn" onclick="doSearch()">🔍</button>
+  </div>
+</div>
+<div class="wiki-tabs">
+  <span class="wiki-tab active">ערך</span>
+  <span class="wiki-tab">שיחה</span>
+  <span class="wiki-tab">קריאה</span>
+  <span class="wiki-tab">עריכה</span>
+  <span class="wiki-tab">היסטוריה</span>
+</div>
+
+<!-- SEARCH RESULTS -->
+<div class="search-results" id="searchResults">
+  <h2 id="srTitle"></h2>
+  <div id="srItems"></div>
+</div>
+
+<!-- ARTICLE -->
+<div class="wiki-content" id="articleArea" style="display:none">
+  <div class="wiki-main">
+    <h1 class="article-title" id="artTitle"></h1>
+    <div class="article-text" id="artBody"></div>
+  </div>
+  <div class="wiki-sidebar">
+    <div class="sidebar-box">
+      <div class="sidebar-title">כלים</div>
+      <div class="sidebar-links">
+        <a href="#">דפים המקשרים לכאן</a>
+        <a href="#">שינויים קשורים</a>
+        <a href="#">דפים מיוחדים</a>
+        <a href="#">קישור קבוע</a>
+        <a href="#">מידע על הדף</a>
+      </div>
+    </div>
+    <div class="sidebar-box">
+      <div class="sidebar-title">הדפסה</div>
+      <div class="sidebar-links">
+        <a href="#">גרסה להדפסה</a>
+        <a href="#">הורדה כ-PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let magicName = '';
+let magicPos = 3;
+let currentStep = 0;
+
+function startMagic() {
+  magicName = document.getElementById('nameInput').value.trim();
+  magicPos = parseInt(document.getElementById('posInput').value) || 3;
+  if (!magicName) { alert('נא להכניס שם!'); return; }
+  if (magicPos < 1 || magicPos > 6) { alert('מיקום בין 1-6!'); return; }
+  currentStep = 0;
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('progressBar').style.display = 'block';
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = (currentStep / magicName.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function goHome() {
+  document.getElementById('searchResults').style.display = 'none';
+  document.getElementById('articleArea').style.display = 'none';
+  document.getElementById('searchInput').value = '';
+}
+
+// ===== SEARCH =====
+async function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+
+  document.getElementById('articleArea').style.display = 'none';
+  document.getElementById('searchResults').style.display = 'block';
+  document.getElementById('srTitle').textContent = 'מחפש "' + q + '"...';
+  document.getElementById('srItems').innerHTML = '<div class="loading">⏳ טוען...</div>';
+
+  try {
+    const url = `https://he.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&srlimit=6&format=json&origin=*`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const results = data.query.search;
+
+    document.getElementById('srTitle').textContent = 'תוצאות חיפוש עבור "' + q + '"';
+
+    if (!results.length) {
+      document.getElementById('srItems').innerHTML = '<p>לא נמצאו תוצאות.</p>';
+      return;
+    }
+
+    document.getElementById('srItems').innerHTML = results.map(r => `
+      <div class="result-item">
+        <h3><a onclick="openArticle('${r.title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">${r.title}</a></h3>
+        <p>${r.snippet.replace(/<[^>]+>/g,'').substring(0,180)}...</p>
+      </div>
+    `).join('');
+
+  } catch(e) {
+    document.getElementById('srItems').innerHTML = '<p>שגיאה. נסה שוב.</p>';
+  }
+}
+
+// ===== ARTICLE =====
+async function openArticle(title) {
+  document.getElementById('searchResults').style.display = 'none';
+  document.getElementById('articleArea').style.display = 'flex';
+  document.getElementById('artTitle').textContent = title;
+  document.getElementById('searchInput').value = title;
+  document.getElementById('artBody').innerHTML = '<div class="loading">⏳ טוען ערך...</div>';
+  window.scrollTo(0,0);
+
+  try {
+    const url = `https://he.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=text&format=json&origin=*`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.error) {
+      document.getElementById('artBody').innerHTML = '<p>הערך לא נמצא.</p>';
+      return;
+    }
+
+    // קבל את האות הנוכחית שצריך
+    const neededLetter = currentStep < magicName.length ? magicName[currentStep] : null;
+
+    let html = data.parse.text['*'];
+
+    // עיבוד קישורים — רק קישורים עם האות הנכונה במיקום magicPos יהיו לחיצים
+    html = html.replace(/href="\/wiki\/([^"#]+)"/g, (match, rawPage) => {
+      const page = decodeURIComponent(rawPage).replace(/_/g,' ');
+      
+      // התעלם מקישורי מטא
+      if (page.startsWith('קובץ:') || page.startsWith('ויקיפדיה:') || 
+          page.startsWith('עזרה:') || page.startsWith('קטגוריה:') ||
+          page.startsWith('שיחה:') || page.startsWith('משתמש:') ||
+          page.startsWith('File:') || page.startsWith('Wikipedia:') ||
+          page.startsWith('Template:') || page.startsWith('תבנית:')) {
+        return 'href="#" onclick="return false;"';
+      }
+
+      if (!neededLetter) {
+        // הקסם נגמר — כל הקישורים רגילים
+        return `href="#" onclick="openArticle('${page.replace(/'/g,"\\'").replace(/\n/g,'')}');return false;"`;
+      }
+
+      // בדוק אם האות במיקום הנכון תואמת
+      const letter = page[magicPos - 1];
+      if (letter === neededLetter) {
+        // ✅ קישור לחיץ — האות נכונה
+        const safeTitle = page.replace(/'/g,"\\'").replace(/\n/g,'');
+        return `href="#" onclick="advanceStep('${safeTitle}');return false;" class="magic-link"`;
+      } else {
+        // ❌ קישור מת — האות שגויה
+        return `href="#" onclick="return false;" class="dead-link"`;
+      }
+    });
+
+    // נקה קישורים חיצוניים ועריכה
+    html = html.replace(/class="mw-editsection[^"]*"[^>]*>[\s\S]*?<\/span><\/span>/g,'');
+    html = html.replace(/<a[^>]*href="(https?:|\/\/)[^"]*"[^>]*>([\s\S]*?)<\/a>/g,'$2');
+
+    document.getElementById('artBody').innerHTML = html;
+
+    // תקן תמונות
+    document.querySelectorAll('#artBody img').forEach(img => {
+      if (img.src && img.src.startsWith('//')) img.src = 'https:' + img.src;
+    });
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('artBody').innerHTML = '<p>שגיאה בטעינה.</p>';
+  }
+}
+
+// ===== ADVANCE =====
+function advanceStep(title) {
+  currentStep++;
+  updateProgress();
+  openArticle(title);
+}
+
+// חיפוש עם Enter
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+});
+</script>
+</body>
+</html>
