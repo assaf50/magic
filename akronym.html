@@ -203,10 +203,12 @@ async function openArticle(title) {
     const data = await res.json();
     if (data.error) { document.getElementById('artBody').innerHTML = '<p>הערך לא נמצא.</p>'; return; }
 
-    // לפני הכנסה ל-DOM — החלף href ב-data-wiki כדי שהדפדפן לא יטפל בו
+    // החלף כל href לפני כניסה ל-DOM
     let rawHtml = data.parse.text['*'];
-    rawHtml = rawHtml.replace(/href="(\/wiki\/[^"]*)"/g, 'data-wiki="$1"');
-    rawHtml = rawHtml.replace(/href="[^"]*"/g, '');
+    // שמור /wiki/ links כ data-wiki
+    rawHtml = rawHtml.replace(/href="(\/wiki\/[^"#]*)(?:#[^"]*)?"/g, 'data-wiki="$1"');
+    // מחק את כל שאר ה-href
+    rawHtml = rawHtml.replace(/ href="[^"]*"/g, '');
 
     const tmp = document.createElement('div');
     tmp.innerHTML = rawHtml;
