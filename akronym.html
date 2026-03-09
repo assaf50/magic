@@ -236,6 +236,14 @@ async function openArticle(title) {
 
     let html = data.parse.text['*'];
 
+    // הסר href מסוכנים שיוצאים מהאתר
+    html = html.replace(/href="\/w\/[^"]*"/g, 'href="#" onclick="return false;"');
+    html = html.replace(/href="\/wiki\/(קובץ|File|ויקיפדיה|Wikipedia|עזרה|Help|קטגוריה|Category|תבנית|Template|שיחה|Talk|משתמש|User)[^"]*"/g, 'href="#" onclick="return false;"');
+
+    // נטרל את כל הקישורים שיוצאים מהאתר
+    html = html.replace(/href="\/w\/[^"]*"/g, 'href="#" onclick="return false;"');
+    html = html.replace(/href="https?:\/\/[^"]*"/g, 'href="#" onclick="return false;"');
+
     // עיבוד קישורים — רק קישורים עם האות הנכונה במיקום magicPos יהיו לחיצים
     html = html.replace(/href="\/wiki\/([^"#]+)"/g, (match, rawPage) => {
       const page = decodeURIComponent(rawPage).replace(/_/g,' ');
