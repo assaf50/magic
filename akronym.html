@@ -203,25 +203,29 @@ async function openArticle(title) {
     const data = await res.json();
     if (data.error) { document.getElementById('artBody').innerHTML = '<p>הערך לא נמצא.</p>'; return; }
 
-    // הכנס את ה-HTML לתוך div זמני
+    // לפני הכנסה ל-DOM — החלף href ב-data-wiki כדי שהדפדפן לא יטפל בו
+    let rawHtml = data.parse.text['*'];
+    rawHtml = rawHtml.replace(/href="(\/wiki\/[^"]*)"/g, 'data-wiki="$1"');
+    rawHtml = rawHtml.replace(/href="[^"]*"/g, '');
+
     const tmp = document.createElement('div');
-    tmp.innerHTML = data.parse.text['*'];
+    tmp.innerHTML = rawHtml;
 
     // עבד כל הקישורים ב-DOM — לא בטקסט!
     const neededLetter = currentStep < magicName.length ? magicName[currentStep] : null;
 
     tmp.querySelectorAll('a').forEach(a => {
-      const href = a.getAttribute('href') || '';
+      const wiki = a.getAttribute('data-wiki') || '';
+      a.removeAttribute('data-wiki');
 
-      // נטרל הכל מלבד /wiki/
-      if (!href.startsWith('/wiki/')) {
-        a.removeAttribute('href');
+      // רק קישורי /wiki/ רלוונטיים
+      if (!wiki.startsWith('/wiki/')) {
         a.style.cursor = 'default';
         return;
       }
 
       // חלץ שם הדף
-      const rawPage = href.replace('/wiki/', '');
+      const rawPage = wiki.replace('/wiki/', '');
       const page = decodeURIComponent(rawPage).replace(/_/g, ' ');
 
       // נטרל קישורי מטא
