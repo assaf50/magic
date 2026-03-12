@@ -72,143 +72,127 @@ html, body { width:100%; height:100%; background:#000; font-family:-apple-system
 </div>
 
 <script>
-(function() {
-  // Clock
-  function updateClock() {
-    const now = new Date();
-    document.getElementById('clockTime').textContent =
-      String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
-  }
-  updateClock();
-  setInterval(updateClock, 10000);
+var current = '0', stored = null, op = null, justCalc = false, magicNum = null, magicUsed = false;
+var dispEl = document.getElementById('mainDisplay');
+var histEl = document.getElementById('history');
+var acBtn = document.getElementById('acBtn');
 
-  // State
-  let current = '0', stored = null, op = null, justCalc = false, magicNum = null, magicUsed = false;
+function updateClock() {
+  var now = new Date();
+  document.getElementById('clockTime').textContent =
+    String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+}
+updateClock();
+setInterval(updateClock, 10000);
 
-  const dispEl = document.getElementById('mainDisplay');
-  const histEl = document.getElementById('history');
-  const acBtn = document.getElementById('acBtn');
+function setDisplay(val) {
+  var s = String(val);
+  dispEl.className = 'main-display';
+  if (s.length > 12) dispEl.classList.add('s12');
+  else if (s.length > 9) dispEl.classList.add('s9');
+  else if (s.length > 7) dispEl.classList.add('s7');
+  else if (s.length > 6) dispEl.classList.add('s6');
+  dispEl.textContent = s;
+  acBtn.textContent = (current === '0' && stored === null) ? 'AC' : 'C';
+}
 
-  function setDisplay(val) {
-    let s = String(val);
-    dispEl.className = 'main-display';
-    if (s.length > 12) dispEl.classList.add('s12');
-    else if (s.length > 9) dispEl.classList.add('s9');
-    else if (s.length > 7) dispEl.classList.add('s7');
-    else if (s.length > 6) dispEl.classList.add('s6');
-    dispEl.textContent = s;
-    acBtn.textContent = (current === '0' && stored === null) ? 'AC' : 'C';
-  }
+function fmt(n) {
+  if (isNaN(n) || !isFinite(n)) return 'Error';
+  return parseFloat(n.toPrecision(10)).toString();
+}
 
-  function fmt(n) {
-    if (isNaN(n) || !isFinite(n)) return 'Error';
-    return parseFloat(n.toPrecision(10)).toString();
-  }
+function clearOps() {
+  document.querySelectorAll('.btn-op').forEach(function(b) { b.classList.remove('active'); });
+}
 
-  function clearOps() {
-    document.querySelectorAll('.btn-op').forEach(b => b.classList.remove('active'));
-  }
+function doCalc(a, b, o) {
+  if (o === '+') return a + b;
+  if (o === '−') return a - b;
+  if (o === '×') return a * b;
+  if (o === '÷') return b !== 0 ? a / b : 'Error';
+  return b;
+}
 
-  function doCalc(a, b, o) {
-    switch(o) {
-      case '+': return a + b;
-      case '−': return a - b;
-      case '×': return a * b;
-      case '÷': return b !== 0 ? a / b : 'Error';
-      default: return b;
-    }
-  }
-
-  // Number buttons
-  document.querySelectorAll('.btn-num').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const n = this.dataset.n;
-      clearOps();
-      if (justCalc) { current = n; justCalc = false; }
-      else current = current === '0' ? n : current + n;
-      if (current.length > 12) current = current.slice(0, 12);
-      setDisplay(current);
-    });
-  });
-
-  // Dot
-  document.getElementById('dotBtn').addEventListener('click', function() {
+document.querySelectorAll('.btn-num').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var n = this.dataset.n;
     clearOps();
-    if (justCalc) { current = '0.'; justCalc = false; }
-    else if (!current.includes('.')) current += '.';
+    if (justCalc) { current = n; justCalc = false; }
+    else current = current === '0' ? n : current + n;
+    if (current.length > 12) current = current.slice(0, 12);
     setDisplay(current);
   });
+});
 
-  // AC/C
-  acBtn.addEventListener('click', function() {
-    current = '0'; stored = null; op = null; justCalc = false; magicUsed = false;
-    histEl.textContent = ''; clearOps(); setDisplay('0');
-  });
+document.getElementById('dotBtn').addEventListener('click', function() {
+  clearOps();
+  if (justCalc) { current = '0.'; justCalc = false; }
+  else if (!current.includes('.')) current += '.';
+  setDisplay(current);
+});
 
-  // +/-
-  document.getElementById('signBtn').addEventListener('click', function() {
-    current = String(parseFloat(current) * -1); setDisplay(current);
-  });
+acBtn.addEventListener('click', function() {
+  current = '0'; stored = null; op = null; justCalc = false; magicUsed = false;
+  histEl.textContent = ''; clearOps(); setDisplay('0');
+});
 
-  // %
-  document.getElementById('pctBtn').addEventListener('click', function() {
-    current = String(parseFloat(current) / 100); setDisplay(current);
-  });
+document.getElementById('signBtn').addEventListener('click', function() {
+  current = String(parseFloat(current) * -1); setDisplay(current);
+});
 
-  // Operators
-  const ops = { divBtn:'÷', mulBtn:'×', subBtn:'−', addBtn:'+' };
-  Object.keys(ops).forEach(id => {
-    document.getElementById(id).addEventListener('click', function() {
-      const o = ops[id];
-      clearOps();
-      if (stored !== null && op && !justCalc) {
-        const r = doCalc(parseFloat(stored), parseFloat(current), op);
-        stored = String(r); current = String(r);
-        histEl.textContent = fmt(r) + ' ' + o;
-      } else {
-        stored = current; histEl.textContent = current + ' ' + o;
-      }
-      op = o; justCalc = true;
-      this.classList.add('active');
-      setDisplay(current);
-    });
-  });
+document.getElementById('pctBtn').addEventListener('click', function() {
+  current = String(parseFloat(current) / 100); setDisplay(current);
+});
 
-  // Equals
-  document.getElementById('eqBtn').addEventListener('click', function() {
-    if (!op || stored === null) return;
-    let a = parseFloat(stored), b = parseFloat(current);
-    if (magicNum !== null && !magicUsed) { b = magicNum; magicUsed = true; }
-    const result = doCalc(a, b, op);
-    histEl.textContent = fmt(a) + ' ' + op + ' ' + fmt(b) + ' =';
-    current = fmt(result); stored = null; op = null; justCalc = true;
-    clearOps(); setDisplay(current);
-  });
-
-  // Firebase
-  firebase.initializeApp({
-    apiKey: "AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
-    authDomain: "assafma-f409e.firebaseapp.com",
-    databaseURL: "https://assafma-f409e-default-rtdb.firebaseio.com",
-    projectId: "assafma-f409e",
-    storageBucket: "assafma-f409e.firebasestorage.app",
-    messagingSenderId: "665696235616",
-    appId: "1:665696235616:web:06fff6145f50c10dcfd305"
-  });
-
-  firebase.database().ref('magic-dudu/myNumber').on('value', function(snap) {
-    const data = snap.val();
-    if (data && data.value !== undefined) {
-      magicNum = data.value;
-      magicUsed = false;
-      current = String(data.value);
-      stored = null; op = null; justCalc = false;
-      clearOps();
-      setDisplay(current);
+var opMap = { divBtn:'÷', mulBtn:'×', subBtn:'−', addBtn:'+' };
+Object.keys(opMap).forEach(function(id) {
+  document.getElementById(id).addEventListener('click', function() {
+    var o = opMap[id];
+    clearOps();
+    if (stored !== null && op && !justCalc) {
+      var r = doCalc(parseFloat(stored), parseFloat(current), op);
+      stored = String(r); current = String(r);
+      histEl.textContent = fmt(r) + ' ' + o;
+    } else {
+      stored = current; histEl.textContent = current + ' ' + o;
     }
+    op = o; justCalc = true;
+    this.classList.add('active');
+    setDisplay(current);
   });
+});
 
-})();
+document.getElementById('eqBtn').addEventListener('click', function() {
+  if (!op || stored === null) return;
+  var a = parseFloat(stored), b = parseFloat(current);
+  if (magicNum !== null && !magicUsed) { b = magicNum; magicUsed = true; }
+  var result = doCalc(a, b, op);
+  histEl.textContent = fmt(a) + ' ' + op + ' ' + fmt(b) + ' =';
+  current = fmt(result); stored = null; op = null; justCalc = true;
+  clearOps(); setDisplay(current);
+});
+
+firebase.initializeApp({
+  apiKey: "AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
+  authDomain: "assafma-f409e.firebaseapp.com",
+  databaseURL: "https://assafma-f409e-default-rtdb.firebaseio.com",
+  projectId: "assafma-f409e",
+  storageBucket: "assafma-f409e.firebasestorage.app",
+  messagingSenderId: "665696235616",
+  appId: "1:665696235616:web:06fff6145f50c10dcfd305"
+});
+
+firebase.database().ref('magic-dudu/myNumber').on('value', function(snap) {
+  var data = snap.val();
+  if (data && data.value !== undefined) {
+    magicNum = data.value;
+    magicUsed = false;
+    current = String(data.value);
+    stored = null; op = null; justCalc = false;
+    clearOps();
+    setDisplay(current);
+  }
+});
 </script>
 </body>
 </html>
