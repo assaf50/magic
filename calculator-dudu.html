@@ -339,8 +339,6 @@
   function clearOp() { document.querySelectorAll('.btn-op').forEach(b=>b.classList.remove('active')); }
 </script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
   firebase.initializeApp({
     apiKey: "AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
@@ -357,8 +355,10 @@
     if (data && data.value !== undefined) {
       window._magicNumber = data.value;
       window._magicReady = true;
+      _magicUsed = false;
       current = String(data.value);
-      stored = null; op = null; justCalc = false; _magicUsed = false;
+      stored = null; op = null; justCalc = false;
+      clearOp();
       updateDisplay(current);
     }
   });
