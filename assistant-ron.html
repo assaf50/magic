@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מסך העוזר 🤫</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
+    authDomain: "assafma-f409e.firebaseapp.com",
+    databaseURL: "https://assafma-f409e-default-rtdb.firebaseio.com",
+    projectId: "assafma-f409e",
+    storageBucket: "assafma-f409e.firebasestorage.app",
+    messagingSenderId: "665696235616",
+    appId: "1:665696235616:web:06fff6145f50c10dcfd305"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  window.sendNumber = (num) => {
+    db.ref('magic-ron/myNumber').set({ value: num, ts: Date.now() })
+      .then(() => {
+        document.getElementById('sentBox').style.display = 'block';
+        document.getElementById('sentVal').textContent = num;
+      })
+      .catch(e => alert('שגיאה: ' + e.message));
+  };
+</script>
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    background: #0d0d1a;
+    color: #f0eeff;
+    font-family: 'Rubik', sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  h1 { font-size: 26px; font-weight: 900; margin-bottom: 4px; }
+  .sub { font-size: 14px; color: #888; margin-bottom: 28px; }
+
+  .label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 2px; color: #888; margin-bottom: 8px; display: block;
+  }
+
+  input[type=number] {
+    width: 100%; background: #1a1a2e; border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 14px; color: #fff; font-family: 'Space Mono', monospace;
+    font-size: 32px; font-weight: 700; padding: 14px 18px; text-align: center;
+    -moz-appearance: textfield; margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input[type=number]:focus { outline: none; border-color: #7B2FFF; }
+
+  .card {
+    background: #111122; border-radius: 18px; padding: 20px;
+    margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .person-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .person-label { font-size: 15px; font-weight: 700; min-width: 70px; }
+  .person-input {
+    flex: 1; background: #1a1a2e; border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 10px; color: #fff; font-family: 'Space Mono', monospace;
+    font-size: 22px; font-weight: 700; padding: 10px 14px; text-align: center;
+    -moz-appearance: textfield;
+  }
+  .person-input::-webkit-outer-spin-button,
+  .person-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .person-input:focus { outline: none; border-color: #7B2FFF; }
+
+  .stats {
+    display: flex; gap: 10px; margin-bottom: 16px;
+  }
+  .stat {
+    flex: 1; background: #1a1a2e; border-radius: 12px; padding: 12px;
+    text-align: center;
+  }
+  .stat-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  .stat-val { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; margin-top: 4px; }
+  .stat-val.green { color: #00E676; }
+
+  .send-btn {
+    width: 100%; padding: 20px; border: none; border-radius: 16px;
+    background: linear-gradient(135deg, #00E676, #00BFA5);
+    color: #003322; font-family: 'Rubik', sans-serif;
+    font-size: 20px; font-weight: 900; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 24px rgba(0,230,118,0.35);
+    margin-bottom: 12px;
+  }
+  .send-btn:active { transform: scale(0.97); }
+  .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .sent-box {
+    display: none; text-align: center;
+    background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.25);
+    border-radius: 14px; padding: 16px; margin-bottom: 12px;
+  }
+  .sent-box .big { font-family: 'Space Mono', monospace; font-size: 48px; font-weight: 700; color: #00E676; }
+  .sent-box .msg { font-size: 13px; color: #888; margin-top: 4px; }
+
+  .add-btn {
+    width: 100%; padding: 10px; background: transparent;
+    border: 1px dashed rgba(255,255,255,0.15); border-radius: 10px;
+    color: #888; font-family: 'Rubik', sans-serif; font-size: 13px;
+    font-weight: 600; cursor: pointer; margin-top: 4px;
+    transition: all 0.2s;
+  }
+  .add-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+
+  .reset-btn {
+    width: 100%; padding: 12px; background: #1a1a2e;
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+    color: #888; font-family: 'Rubik', sans-serif; font-size: 14px;
+    font-weight: 700; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<h1>🤫 מסך העוזר</h1>
+<p class="sub">שמע את המספרים → לחץ שלח → המחשבון של רון מתעדכן!</p>
+
+<div class="card">
+  <span class="label">🎯 מספר יעד (זהה לרון)</span>
+  <input type="number" id="target" value="1000" oninput="recalc()" />
+</div>
+
+<div class="card">
+  <span class="label">📢 מספרי הקהל</span>
+  <div id="peopleList">
+    <div class="person-row">
+      <span class="person-label">👤 אדם 1</span>
+      <input type="number" class="person-input" placeholder="—" oninput="recalc()" />
+    </div>
+    <div class="person-row">
+      <span class="person-label">👤 אדם 2</span>
+      <input type="number" class="person-input" placeholder="—" oninput="recalc()" />
+    </div>
+  </div>
+  <button class="add-btn" onclick="addPerson()">+ הוסף אדם</button>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-label">סכום קהל</div>
+    <div class="stat-val" id="sumVal">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">יעד</div>
+    <div class="stat-val" id="targetVal">1000</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">מספר רון</div>
+    <div class="stat-val green" id="myNumVal">—</div>
+  </div>
+</div>
+
+<div class="sent-box" id="sentBox">
+  <div class="big" id="sentVal">—</div>
+  <div class="msg">✅ נשלח! המחשבון של רון התעדכן</div>
+</div>
+
+<button class="send-btn" id="sendBtn" onclick="doSend()" disabled>
+  📡 שלח למחשבון של רון!
+</button>
+
+<button class="reset-btn" onclick="reset()">🔄 איפוס</button>
+
+<script>
+  const EMOJIS = ['👤','🧑','👨','👩','🧔','🧒'];
+  let personCount = 2;
+
+  function recalc() {
+    const target = parseInt(document.getElementById('target').value) || 0;
+    document.getElementById('targetVal').textContent = target || '—';
+    const inputs = document.querySelectorAll('.person-input');
+    let sum = 0, filled = 0;
+    inputs.forEach(i => { const v = parseInt(i.value) || 0; sum += v; if (i.value.trim()) filled++; });
+    document.getElementById('sumVal').textContent = sum;
+    const myNum = target - sum;
+    document.getElementById('myNumVal').textContent = filled > 0 ? myNum : '—';
+    const btn = document.getElementById('sendBtn');
+    btn.disabled = !(filled > 0 && target > 0);
+    btn.textContent = filled > 0 ? `📡 שלח ${myNum} למחשבון של רון!` : '📡 שלח למחשבון של רון!';
+    document.getElementById('sentBox').style.display = 'none';
+  }
+
+  function doSend() {
+    const target = parseInt(document.getElementById('target').value) || 0;
+    const inputs = document.querySelectorAll('.person-input');
+    let sum = 0;
+    inputs.forEach(i => sum += parseInt(i.value) || 0);
+    window.sendNumber(target - sum);
+  }
+
+  function addPerson() {
+    personCount++;
+    const div = document.createElement('div');
+    div.className = 'person-row';
+    div.innerHTML = `
+      <span class="person-label">${EMOJIS[personCount-1] || '👤'} אדם ${personCount}</span>
+      <input type="number" class="person-input" placeholder="—" oninput="recalc()" />
+    `;
+    document.getElementById('peopleList').appendChild(div);
+  }
+
+  function reset() {
+    document.querySelectorAll('.person-input').forEach(i => i.value = '');
+    document.getElementById('sentBox').style.display = 'none';
+    recalc();
+  }
+</script>
+</body>
+</html>
