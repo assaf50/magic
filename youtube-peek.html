@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Peek 🤫</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyARe0oAWcfEKXBaakw0_ZRJ1fo5-Y49Yag",
+    authDomain: "assafma-f409e.firebaseapp.com",
+    databaseURL: "https://assafma-f409e-default-rtdb.firebaseio.com",
+    projectId: "assafma-f409e",
+    storageBucket: "assafma-f409e.firebasestorage.app",
+    messagingSenderId: "665696235616",
+    appId: "1:665696235616:web:06fff6145f50c10dcfd305"
+  });
+  var db = firebase.database();
+
+  function sendSong() {
+    var song = document.getElementById('songInput').value.trim();
+    var artist = document.getElementById('artistInput').value.trim();
+    if (!song) return;
+    db.ref('magic-youtube/song').set({ song: song, artist: artist, ts: Date.now() })
+      .then(function() {
+        document.getElementById('sentBox').style.display = 'block';
+        document.getElementById('sentSong').textContent = song + (artist ? ' - ' + artist : '');
+        document.getElementById('songInput').value = '';
+        document.getElementById('artistInput').value = '';
+      })
+      .catch(function(e) { alert('שגיאה: ' + e.message); });
+  }
+</script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0d0d1a; color:#f0eeff; font-family:'Rubik',sans-serif; min-height:100vh; padding:24px 16px; max-width:420px; margin:0 auto; }
+h1 { font-size:26px; font-weight:900; margin-bottom:4px; }
+.sub { font-size:14px; color:#888; margin-bottom:28px; }
+.label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#888; margin-bottom:8px; display:block; }
+.card { background:#111122; border-radius:18px; padding:20px; margin-bottom:16px; border:1px solid rgba(255,255,255,0.07); }
+input[type=text] {
+  width:100%; background:#1a1a2e; border:2px solid rgba(255,255,255,0.1);
+  border-radius:14px; color:#fff; font-family:'Rubik',sans-serif;
+  font-size:20px; font-weight:700; padding:14px 18px;
+  margin-bottom:12px; outline:none; transition:border-color 0.2s;
+}
+input[type=text]:focus { border-color:#ff0000; }
+input[type=text]::placeholder { color:#555; font-weight:400; }
+.send-btn {
+  width:100%; padding:20px; border:none; border-radius:16px;
+  background:linear-gradient(135deg,#ff0000,#cc0000);
+  color:#fff; font-family:'Rubik',sans-serif;
+  font-size:20px; font-weight:900; cursor:pointer;
+  box-shadow:0 4px 24px rgba(255,0,0,0.35); margin-bottom:12px;
+}
+.send-btn:active { transform:scale(0.97); }
+.sent-box {
+  display:none; text-align:center;
+  background:rgba(255,0,0,0.08); border:1px solid rgba(255,0,0,0.25);
+  border-radius:14px; padding:16px; margin-bottom:12px;
+}
+.sent-box .big { font-family:'Space Mono',monospace; font-size:22px; font-weight:700; color:#ff4444; }
+.sent-box .msg { font-size:13px; color:#888; margin-top:4px; }
+.reset-btn {
+  width:100%; padding:12px; background:#1a1a2e;
+  border:1px solid rgba(255,255,255,0.08); border-radius:12px;
+  color:#888; font-family:'Rubik',sans-serif; font-size:14px; font-weight:700; cursor:pointer;
+}
+</style>
+</head>
+<body>
+<h1>🎵 YouTube Peek</h1>
+<p class="sub">כתוב את השיר → שלח → מופיע ב-YouTube של אסף!</p>
+
+<div class="card">
+  <span class="label">🎵 שם השיר</span>
+  <input type="text" id="songInput" placeholder="למשל: Bohemian Rhapsody" />
+  <span class="label">🎤 אמן (לא חובה)</span>
+  <input type="text" id="artistInput" placeholder="למשל: Queen" />
+</div>
+
+<div class="sent-box" id="sentBox">
+  <div class="big" id="sentSong">—</div>
+  <div class="msg">✅ נשלח! YouTube של אסף התעדכן</div>
+</div>
+
+<button class="send-btn" onclick="sendSong()">📡 שלח ל-YouTube של אסף!</button>
+<button class="reset-btn" onclick="document.getElementById('sentBox').style.display='none'">🔄 איפוס</button>
+</body>
+</html>
