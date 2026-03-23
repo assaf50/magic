@@ -136,7 +136,7 @@
 <p class="sub">שמע את המספרים → לחץ שלח → המחשבון של קיקו מתעדכן!</p>
 
 <div class="card">
-  <span class="label">🎯 מספר יעד (זהה לאסף)</span>
+  <span class="label">🎯 מספר יעד (זהה לקיקו)</span>
   <input type="number" id="target" value="1000" oninput="recalc()" />
 </div>
 
@@ -196,7 +196,7 @@
     document.getElementById('myNumVal').textContent = filled > 0 ? myNum : '—';
     const btn = document.getElementById('sendBtn');
     btn.disabled = !(filled > 0 && target > 0);
-    btn.textContent = filled > 0 ? `📡 שלח ${myNum} למחשבון של אסף!` : '📡 שלח למחשבון של קיקו!';
+    btn.textContent = filled > 0 ? `📡 שלח ${myNum} למחשבון של קיקו!` : '📡 שלח למחשבון של קיקו!';
     document.getElementById('sentBox').style.display = 'none';
   }
 
